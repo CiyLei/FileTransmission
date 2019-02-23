@@ -9,7 +9,7 @@ import java.util.Vector;
 public class DefaultConfiguration implements Configuration {
 
     /**
-     * 这里遍历了后2个网段的所有ip
+     * 这里根据自身所有的ip，每个都遍历了后2个网段的所有ip
      * 比如现在的ip为192.168.2.3,则返回192.168.1.1-192.168.254.254所有的ip
      * 且从192.168.2.3开始散发，保证快速找到相近的ip段
      * @return
