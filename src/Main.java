@@ -13,7 +13,7 @@ public class Main {
                     System.out.println("扫描到客户端：" + ip);
                 }
             });
-//            scan.startScan();
+            scan.startScan();
         } catch (SocketException e) {
             e.printStackTrace();
         }

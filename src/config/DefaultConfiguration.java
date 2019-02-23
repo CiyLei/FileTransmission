@@ -74,6 +74,7 @@ public class DefaultConfiguration implements Configuration {
         } catch (SocketException e) {
             e.printStackTrace();
         }
+        ipList.remove("127.0.0.1");
         return ipList;
     }
 

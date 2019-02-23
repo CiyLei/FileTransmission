@@ -108,11 +108,11 @@ public class BroadcastScan implements Scan {
                     String respone = new String(datagramPacket.getData(), 0, datagramPacket.getLength()).trim();
                     for (Scan.ScanListener listener : listeners) {
                         System.out.println(respone);
-                        listener.onGet(datagramPacket.getAddress().getHostName());
+                        listener.onGet(datagramPacket.getAddress().getHostAddress());
                     }
                     // 如果是接受到广播的话，就进行回复,否则的话就是回复广播，不理他
                     if (respone.equals(TAG_SEND)) {
-                        reply(datagramPacket.getAddress().getHostName());
+                        reply(datagramPacket.getAddress().getHostAddress());
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
