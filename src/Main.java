@@ -1,4 +1,5 @@
 import scan.Scan;
+import send.Client;
 
 import java.net.SocketException;
 
@@ -9,8 +10,8 @@ public class Main {
             Scan scan = new FileTransmission().getBroadcastScan();
             scan.addListener(new Scan.ScanListener() {
                 @Override
-                public void onGet(String ip) {
-                    System.out.println("扫描到客户端：" + ip);
+                public void onGet(Client client) {
+                    System.out.println("扫描到客户端：" + client.getIp());
                 }
 
                 @Override

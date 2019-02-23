@@ -1,6 +1,7 @@
 package scan;
 
 import config.Configuration;
+import send.SocketClient;
 
 import java.io.IOException;
 import java.net.*;
@@ -8,6 +9,9 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * 采用udp广播的形式实现扫描设备
+ */
 public class BroadcastScan implements Scan {
 
     private Configuration config;
@@ -124,7 +128,7 @@ public class BroadcastScan implements Scan {
                     String respone = new String(datagramPacket.getData(), 0, datagramPacket.getLength()).trim();
                     for (Scan.ScanListener listener : listeners) {
 //                        System.out.println(respone);
-                        listener.onGet(datagramPacket.getAddress().getHostAddress());
+                        listener.onGet(new SocketClient(datagramPacket.getAddress().getHostAddress(), config));
                     }
                     // 如果是接受到广播的话，就进行回复,否则的话就是回复广播，不理他
                     if (respone.equals(TAG_SEND)) {

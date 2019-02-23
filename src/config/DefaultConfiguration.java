@@ -6,6 +6,9 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
 
+/**
+ * 默认的配置信息
+ */
 public class DefaultConfiguration implements Configuration {
 
     /**

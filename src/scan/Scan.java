@@ -1,7 +1,12 @@
 package scan;
 
+import send.Client;
+
 import java.net.SocketException;
 
+/**
+ * 扫描器，获取所有潜在的客户端
+ */
 public interface Scan {
 
     /**
@@ -20,7 +25,7 @@ public interface Scan {
      * 成功获取到客户端的回调
      */
     public interface ScanListener {
-        void onGet(String ip);
+        void onGet(Client client);
         void onFinish();
     }
 }

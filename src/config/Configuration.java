@@ -2,6 +2,9 @@ package config;
 
 import java.util.Vector;
 
+/**
+ * 自定义的配置信息
+ */
 public interface Configuration {
 
     /**
