@@ -21,5 +21,6 @@ public interface Scan {
      */
     public interface ScanListener {
         void onGet(String ip);
+        void onFinish();
     }
 }

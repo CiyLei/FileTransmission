@@ -1,11 +1,10 @@
+package scan;
+
 import config.Configuration;
-import scan.Scan;
 
 import java.io.IOException;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -20,12 +19,15 @@ public class BroadcastScan implements Scan {
     public static String TAG_SEND = "FileTransmission_Broadcast_SEND";
     // 回复的标志
     public static String TAG_RECEIVE = "FileTransmission_Broadcast_RECEIVE";
+    // 保存所有线程是否完成的信息
+    private Map<BroadcastScanTask, Boolean> tasks;
 
     public BroadcastScan(Configuration configuration) throws SocketException {
         this.config = configuration;
         scanThreadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
         isScan = false;
         listeners = new ArrayList<>();
+        tasks = new HashMap<>();
         new BroadcastServer().start();
     }
 
@@ -33,14 +35,26 @@ public class BroadcastScan implements Scan {
     public void startScan() throws SocketException {
         final Vector ips = this.config.broadcastHost();
         for (int i = 0; i < Runtime.getRuntime().availableProcessors() * 2; i++) {
-            scanThreadPool.execute(new BroadcastScanTask(ips));
+            BroadcastScanTask task = new BroadcastScanTask(ips);
+            this.tasks.put(task, false);
+            scanThreadPool.execute(task);
         }
     }
 
     @Override
     public void stopScan() {
         isScan = false;
-        listeners.clear();
+        tasks.clear();
+    }
+
+    private void ckeckAllFinish() {
+        for (Boolean isFinish : tasks.values()) {
+            if (!isFinish)
+                return;
+        }
+        tasks.clear();
+        for (Scan.ScanListener listener : listeners)
+            listener.onFinish();
     }
 
     @Override
@@ -74,6 +88,8 @@ public class BroadcastScan implements Scan {
             }
             socket.close();
             isScan = false;
+            tasks.put(this, true);
+            ckeckAllFinish();
         }
 
         private void sendBroadcast(String ip) {

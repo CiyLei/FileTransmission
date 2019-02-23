@@ -12,6 +12,11 @@ public class Main {
                 public void onGet(String ip) {
                     System.out.println("扫描到客户端：" + ip);
                 }
+
+                @Override
+                public void onFinish() {
+                    System.out.println("扫描完毕");
+                }
             });
             scan.startScan();
         } catch (SocketException e) {

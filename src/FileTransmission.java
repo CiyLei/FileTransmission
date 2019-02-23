@@ -1,5 +1,6 @@
 import config.Configuration;
 import config.DefaultConfiguration;
+import scan.BroadcastScan;
 import scan.Scan;
 
 import java.net.SocketException;
