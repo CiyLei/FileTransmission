@@ -16,31 +16,11 @@ public class DefaultConfiguration implements Configuration {
      */
     @Override
     public Vector<String> broadcastHost() {
-        Vector<String> ips = new Vector<>(0, 255);
+        Vector<String> ips = new Vector<>(0, 254);
         try {
             List<String> localIPList = getLocalIPList();
-            if (localIPList.size() > 0) {
-                String selfIp = localIPList.get(0);
-                String[] ip_split = selfIp.split("\\.");
-                if (ip_split.length == 4) {
-//                    ips.addElement("192.168.1.108");
-                    // 获取第四个网段的所有ip
-                    List<String> DIP4 = distributeIpParagraph(Integer.parseInt(ip_split[3]));
-                    for (String d4 : DIP4) {
-                        String ip = ip_split[0] + "." + ip_split[1] + "." + ip_split[2] + "." + d4;
-                        if (!localIPList.contains(ip))
-                            ips.addElement(ip);
-                    }
-                    // 遍历第3个网段，第4个网段顺序为1-255
-                    List<String> DIP3 = distributeIpParagraph(Integer.parseInt(ip_split[2]));
-                    for (String d3 : DIP3) {
-                        for (Integer i = 1; i <= 255; i++) {
-                            String ip = ip_split[0] + "." + ip_split[1] + "." + d3 + "." + i.toString();
-                            if (!localIPList.contains(ip))
-                                ips.addElement(ip);
-                        }
-                    }
-                }
+            for (String localIp : localIPList) {
+                ips.addAll(distributeIp34(localIp, localIPList));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -80,7 +60,37 @@ public class DefaultConfiguration implements Configuration {
     }
 
     /**
-     * 根据一个ip端，返回所有的散发ip端。（比如ip为56，则返回[57,58...255,55,54...1]）
+     * 根据一个ip, 返回所有的散发3和4网段的ip。（比如ip为2.2.2.3，则返回[ 2.2.2.4, 2.2.2.5 ... 2.2.2.254, 2.2.2.2, 2.2.2.1, 2.2.3.1, 2.2.3.2 ... 2.2.3.254, 2.2.4.1 ... 2.2.1.254]）
+     * @param ip
+     * @return
+     */
+    private List<String> distributeIp34(String ip, List<String> localIPList) {
+        List<String> ips = new ArrayList<>();
+        String[] ip_split = ip.split("\\.");
+        if (ip_split.length == 4) {
+//                    ips.addElement("192.168.1.108");
+            // 获取第四个网段的所有ip
+            List<String> DIP4 = distributeIpParagraph(Integer.parseInt(ip_split[3]));
+            for (String d4 : DIP4) {
+                String tmp_ip = ip_split[0] + "." + ip_split[1] + "." + ip_split[2] + "." + d4;
+                if (!localIPList.contains(tmp_ip))
+                    ips.add(tmp_ip);
+            }
+            // 遍历第3个网段，第4个网段顺序为1-254
+            List<String> DIP3 = distributeIpParagraph(Integer.parseInt(ip_split[2]));
+            for (String d3 : DIP3) {
+                for (Integer i = 1; i <= 255; i++) {
+                    String tmp_ip = ip_split[0] + "." + ip_split[1] + "." + d3 + "." + i.toString();
+                    if (!localIPList.contains(tmp_ip))
+                        ips.add(tmp_ip);
+                }
+            }
+        }
+        return ips;
+    }
+
+    /**
+     * 根据一个ip段，返回所有的散发ip段。（比如ip为56，则返回[ 57, 58 ... 253, 254, 55, 54 ... 2, 1 ]）
      * @param ip
      * @return
      */
