@@ -10,7 +10,7 @@ public class DefaultConfiguration implements Configuration {
 
     /**
      * 这里遍历了后2个网段的所有ip
-     * 比如现在的ip为192.168.2.3,则返回192.168.1.1-192.168.255.255所有的ip
+     * 比如现在的ip为192.168.2.3,则返回192.168.1.1-192.168.254.254所有的ip
      * 且从192.168.2.3开始散发，保证快速找到相近的ip段
      * @return
      */
@@ -23,6 +23,7 @@ public class DefaultConfiguration implements Configuration {
                 String selfIp = localIPList.get(0);
                 String[] ip_split = selfIp.split("\\.");
                 if (ip_split.length == 4) {
+//                    ips.addElement("192.168.1.108");
                     // 获取第四个网段的所有ip
                     List<String> DIP4 = distributeIpParagraph(Integer.parseInt(ip_split[3]));
                     for (String d4 : DIP4) {
@@ -85,8 +86,8 @@ public class DefaultConfiguration implements Configuration {
      */
     private List<String> distributeIpParagraph(Integer ip) {
         List<String> ips = new ArrayList<>();
-        if (ip < 255) {
-            for (Integer i = ip + 1; i <= 255; i++) {
+        if (ip < 254) {
+            for (Integer i = ip + 1; i <= 254; i++) {
                 ips.add(i.toString());
             }
         }
