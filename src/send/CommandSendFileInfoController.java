@@ -13,18 +13,18 @@ public class CommandSendFileInfoController implements AcceptController {
 
     private Socket commandSocket;
     private DataOutputStream commandDataOutputStream;
+    private String serverIp;
 
     public CommandSendFileInfoController(String serverIp) {
-        try {
-            commandSocket = new Socket(serverIp, 0);
-            commandDataOutputStream = new DataOutputStream(commandSocket.getOutputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.serverIp = serverIp;
     }
 
     public void sendFileInfo(FileInfo file) {
         try {
+            if (commandSocket == null)
+                commandSocket = new Socket(serverIp, 0);
+            if (commandDataOutputStream == null)
+                commandDataOutputStream = new DataOutputStream(commandSocket.getOutputStream());
             String fileName = file.getFile().getName();
             String fileSize = String.valueOf(file.getFile().length());
             String fileHash = file.getFileHashValue();
@@ -35,10 +35,6 @@ public class CommandSendFileInfoController implements AcceptController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public Boolean isSuccessInit() {
-        return commandSocket != null && commandDataOutputStream != null;
     }
 
     @Override

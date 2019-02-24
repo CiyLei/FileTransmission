@@ -37,12 +37,7 @@ public class SocketClient extends Client {
     public void sendFile(File file) {
         if (file.exists()) {
             if (sendState == null || sendState == TransmissionState.FINISH || sendState == TransmissionState.ERROR) {
-                if (sendFileInfoController.isSuccessInit()) {
-                    analysisFile(file);
-                } else {
-                    for (Client.ClientListener listener : listeners)
-                        listener.onStateChange(TransmissionState.ERROR);
-                }
+                analysisFile(file);
             }
         }
     }
