@@ -3,7 +3,6 @@ import send.Client;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.SocketException;
 
 public class Main {
 
@@ -16,7 +15,7 @@ public class Main {
                     // getInetAddress().getHostAddress()是个阻塞方法，慎用
 //                    System.out.println("扫描到客户端：" + client.getInetAddress().getHostName() + "-" + client.getInetAddress().getHostAddress());
                     System.out.println("扫描到客户端：" + client.getInetAddress().getHostAddress());
-                    client.sendFile(new File("E:\\Java8\\jdk1.8.0_25\\src.zip"));
+                    client.sendFile(new File("/Users/chenlei/Documents/Postman_v4.1.3/icon_32.png"));
                 }
 
                 @Override

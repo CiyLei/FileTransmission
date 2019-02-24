@@ -1,13 +1,11 @@
 package server;
 
 import config.Configuration;
+import send.ReceiveFileCommandController;
 
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Base64;
 
 /**
  * 命令管理类
@@ -22,8 +20,7 @@ import java.util.Base64;
  */
 public class CommandServerSocket extends ServerSocket {
 
-    Configuration config;
-    private DataInputStream commandDataInputStream;
+    private Configuration config;
 
     public CommandServerSocket(Configuration config) throws IOException {
         super(config.commandPort());
@@ -38,63 +35,12 @@ public class CommandServerSocket extends ServerSocket {
                 while (true) {
                     try {
                         Socket socket = accept();
-                        config.commandPool().execute(new CommandAnalysisTask(socket));
+                        config.commandPool().execute(new ReceiveFileCommandController(socket, config));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
             }
         });
-    }
-
-    /**
-     * 命令分析类
-     */
-    public class CommandAnalysisTask implements Runnable {
-
-        private Socket socket;
-
-        public CommandAnalysisTask(Socket socket) {
-            this.socket = socket;
-        }
-
-        @Override
-        public void run() {
-            try {
-                commandDataInputStream = new DataInputStream(socket.getInputStream());
-                String data = commandDataInputStream.readUTF();
-                String[] split = data.split(",");
-                if (split.length > 0) {
-                    switch (Integer.parseInt(split[0])) {
-                        case 1:
-                            obtainFileInfo(split);
-                            break;
-                        case 2:
-                            break;
-                        case 3:
-                            break;
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        /**
-         * 获取到了文件信息
-         * @param data
-         */
-        private void obtainFileInfo(String[] data) {
-            if (data.length == 4) {
-                try {
-                    String fileName = new String(Base64.getDecoder().decode(data[1]), "utf-8");
-                    Long fileSize = Long.parseLong(data[2]);
-                    String fileHash = data[3];
-                    System.out.println("获取到了文件信息 name：" + fileName + " size:" + fileSize + " hash:" + fileHash);
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 }

@@ -12,33 +12,34 @@ import java.net.InetAddress;
 public class SocketClient extends Client {
 
     private FileInfo sendFile;
-    private double sendProgress;
-    private TransmissionState sendState;
+//    private double sendProgress;
+//    private TransmissionState sendState;
     // 命令管理socket
-    private CommandSendFileInfoController sendFileInfoController;
+    private SendFileCommandController sendFileInfoController;
 
     public SocketClient(InetAddress inetAddress, Configuration configuration) {
         super(inetAddress, configuration);
-        addListener(new ClientListener() {
-            @Override
-            void onProgress(double progress) {
-                sendProgress = progress;
-            }
-
-            @Override
-            void onStateChange(TransmissionState state) {
-                sendState = state;
-            }
-        });
-        sendFileInfoController = new CommandSendFileInfoController(inetAddress.getHostAddress(), configuration.commandPort());
+//        addListener(new ClientListener() {
+//            @Override
+//            void onProgress(double progress) {
+//                sendProgress = progress;
+//            }
+//
+//            @Override
+//            void onStateChange(TransmissionState state) {
+//                sendState = state;
+//            }
+//        });
+        sendFileInfoController = new SendFileCommandController(inetAddress.getHostAddress(), configuration);
     }
 
     @Override
     public void sendFile(File file) {
         if (file.exists()) {
-            if (sendState == null || sendState == TransmissionState.FINISH || sendState == TransmissionState.ERROR) {
-                analysisFile(file);
-            }
+//            if (sendState == null || sendState == TransmissionState.FINISH || sendState == TransmissionState.ERROR) {
+//                analysisFile(file);
+//            }
+            analysisFile(file);
         }
     }
 
@@ -47,8 +48,8 @@ public class SocketClient extends Client {
      * @param file
      */
     private void analysisFile(File file) {
-        for (Client.ClientListener listener : listeners)
-            listener.onStateChange(TransmissionState.ANALYSIS);
+//        for (Client.ClientListener listener : listeners)
+//            listener.onStateChange(TransmissionState.ANALYSIS);
         configuration.commandPool().execute(new Runnable() {
             @Override
             public void run() {
@@ -59,8 +60,8 @@ public class SocketClient extends Client {
                     sendFileInfoController.sendFileInfo(sendFile);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    for (Client.ClientListener listener : listeners)
-                        listener.onStateChange(TransmissionState.ERROR);
+//                    for (Client.ClientListener listener : listeners)
+//                        listener.onStateChange(TransmissionState.ERROR);
                 }
             }
         });
@@ -71,11 +72,11 @@ public class SocketClient extends Client {
         return sendFile;
     }
 
-    public double getProgress() {
-        return sendProgress;
-    }
-
-    public TransmissionState getState() {
-        return sendState;
-    }
+//    public double getProgress() {
+//        return sendProgress;
+//    }
+//
+//    public TransmissionState getState() {
+//        return sendState;
+//    }
 }

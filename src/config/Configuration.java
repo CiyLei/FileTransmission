@@ -1,5 +1,7 @@
 package config;
 
+import server.CommandListener;
+
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -8,6 +10,19 @@ import java.util.concurrent.Executors;
  * 自定义的配置信息
  */
 public abstract class Configuration {
+
+    /**
+     * 命令socket监听
+     */
+    private CommandListener listener;
+
+    public Configuration(CommandListener listener) {
+        this.listener = listener;
+    }
+
+    public CommandListener getListener() {
+        return listener;
+    }
 
     /**
      * 需要扫描的网络ip

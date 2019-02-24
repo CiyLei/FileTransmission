@@ -1,5 +1,7 @@
 package config;
 
+import server.CommandListener;
+
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -10,6 +12,10 @@ import java.util.Vector;
  * 默认的配置信息
  */
 public class DefaultConfiguration extends Configuration {
+
+    public DefaultConfiguration(CommandListener listener) {
+        super(listener);
+    }
 
     /**
      * 这里根据自身所有的ip，每个都遍历了后2个网段的所有ip
