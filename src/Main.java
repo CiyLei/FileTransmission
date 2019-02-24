@@ -11,7 +11,9 @@ public class Main {
             scan.addListener(new Scan.ScanListener() {
                 @Override
                 public void onGet(Client client) {
+                    // getInetAddress().getHostAddress()是个阻塞方法，慎用
 //                    System.out.println("扫描到客户端：" + client.getInetAddress().getHostName() + "-" + client.getInetAddress().getHostAddress());
+                    System.out.println("扫描到客户端：" + client.getInetAddress().getHostAddress());
                 }
 
                 @Override
