@@ -14,15 +14,18 @@ public class CommandSendFileInfoController implements AcceptController {
     private Socket commandSocket;
     private DataOutputStream commandDataOutputStream;
     private String serverIp;
+    private Integer commandPort;
 
-    public CommandSendFileInfoController(String serverIp) {
+    public CommandSendFileInfoController(String serverIp, Integer commandPort) {
         this.serverIp = serverIp;
+        this.commandPort = commandPort;
     }
 
     public void sendFileInfo(FileInfo file) {
         try {
+            System.out.println("--" + serverIp + ":" + commandPort);
             if (commandSocket == null)
-                commandSocket = new Socket(serverIp, 0);
+                commandSocket = new Socket(serverIp, commandPort);
             if (commandDataOutputStream == null)
                 commandDataOutputStream = new DataOutputStream(commandSocket.getOutputStream());
             String fileName = file.getFile().getName();

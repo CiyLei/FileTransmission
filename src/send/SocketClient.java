@@ -30,7 +30,7 @@ public class SocketClient extends Client {
                 sendState = state;
             }
         });
-        sendFileInfoController = new CommandSendFileInfoController(inetAddress.getHostAddress());
+        sendFileInfoController = new CommandSendFileInfoController(inetAddress.getHostAddress(), configuration.commandPort());
     }
 
     @Override

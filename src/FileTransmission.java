@@ -4,7 +4,9 @@ import scan.BroadcastScan;
 import scan.Scan;
 import send.Client;
 import send.SocketClient;
+import server.CommandServerSocket;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -13,15 +15,16 @@ public class FileTransmission {
 
     private Configuration configuration;
     private Scan broadcastScan;
+    private CommandServerSocket commandServerSocket;
 
-    public FileTransmission() throws SocketException {
-        this.configuration = new DefaultConfiguration();
-        this.broadcastScan = new BroadcastScan(configuration);
+    public FileTransmission() throws IOException {
+        this(new DefaultConfiguration());
     }
 
-    public FileTransmission(Configuration configuration) throws SocketException {
+    public FileTransmission(Configuration configuration) throws IOException {
         this.configuration = configuration;
         this.broadcastScan = new BroadcastScan(configuration);
+        this.commandServerSocket = new CommandServerSocket(configuration);
     }
 
     /**
