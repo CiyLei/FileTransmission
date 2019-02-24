@@ -128,6 +128,15 @@ public class DefaultConfiguration extends Configuration {
     }
 
     /**
+     * 因为广播太快了，之前的udp端口都还未来得及关闭，达到上限，所以就挂了，这里就给个最大重试的机会
+     * @return
+     */
+    @Override
+    public Integer broadcastRetryMaxCount() {
+        return 100;
+    }
+
+    /**
      * 命令socket的端口
      * @return
      */

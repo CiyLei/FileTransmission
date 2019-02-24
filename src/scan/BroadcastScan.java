@@ -68,9 +68,13 @@ public class BroadcastScan implements Scan {
 
         private Vector ips;
         private DatagramSocket socket;
+        private Integer retryMaxCount;
+        private Integer retryCount;
 
         BroadcastScanTask(Vector ips) throws SocketException {
             this.ips = ips;
+            this.retryCount = 0;
+            this.retryMaxCount = config.broadcastRetryMaxCount();
             socket = new DatagramSocket(0);
         }
 
@@ -98,8 +102,16 @@ public class BroadcastScan implements Scan {
                 //指定包要发送的目的地
                 DatagramPacket request = new DatagramPacket(BroadcastScan.TAG_SEND.getBytes(), BroadcastScan.TAG_SEND.getBytes().length, address, config.broadcastPort());
                 socket.send(request);
-            } catch (Exception e) {
-                e.printStackTrace();
+                if (retryCount > 0)
+                    System.out.println("重试了:" + retryCount);
+                retryCount = 0;
+            } catch (IOException e) {
+//                e.printStackTrace();
+                // 因为广播太快了，之前的udp端口都还未来得及关闭，达到上限，所以就挂了，这里就给个最大重试的机会
+                if (retryCount < retryMaxCount) {
+                    ++retryCount;
+                    sendBroadcast(ip);
+                }
             }
         }
     }

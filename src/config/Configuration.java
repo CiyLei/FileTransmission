@@ -37,6 +37,12 @@ public abstract class Configuration {
     public abstract Integer broadcastPort();
 
     /**
+     * 因为广播太快了，之前的udp端口都还未来得及关闭，达到上限，所以就挂了，这里就给个最大重试的机会
+     * @return
+     */
+    public abstract Integer broadcastRetryMaxCount();
+
+    /**
      * 命令socket的端口
      * @return
      */
