@@ -3,6 +3,7 @@ package send;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.List;
 
 /**
  * 命令管理类
@@ -18,12 +19,16 @@ import java.net.Socket;
 public class CommandManager {
 
     private Socket commandSocket;
+    private List<Client.ClientListener> listeners;
 
-    public CommandManager() {
+    public CommandManager(List<Client.ClientListener> listeners) {
+        this.listeners = listeners;
         try {
             commandSocket = new Socket((String) null, 0);
         } catch (IOException e) {
             e.printStackTrace();
+            for (Client.ClientListener listener : listeners)
+                listener.onStateChange(TransmissionState.ERROR);
         }
     }
 

@@ -34,7 +34,6 @@ public abstract class Client {
 
     /**
      * 传输中的回调
-     * onProgress和onStateChange的回调只有再onAccept里面的accept为true的时候才有
      */
     public abstract class ClientListener {
         /**
@@ -70,6 +69,10 @@ public abstract class Client {
  */
 enum TransmissionState {
     /**
+     * 分析文件中（主要是获取文件hash值）
+     */
+    ANALYSIS,
+    /**
      * 传输中
      */
     TRANSMISSIONDING,
@@ -80,5 +83,9 @@ enum TransmissionState {
     /**
      * 传输完毕
      */
-    FINISH
+    FINISH,
+    /**
+     * 传输错误
+     */
+    ERROR
 }

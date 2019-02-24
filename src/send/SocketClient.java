@@ -10,7 +10,7 @@ import java.net.InetAddress;
  */
 public class SocketClient extends Client {
 
-    private File sendFile;
+    private FileInfo sendFile;
     private double sendProgress;
     private TransmissionState sendState;
     // 命令管理socket
@@ -34,12 +34,26 @@ public class SocketClient extends Client {
 
     @Override
     void sendFile(File file) {
-        if (!file.exists())
-            return;
-        this.sendFile = file;
+        if (sendState == null || sendState == TransmissionState.FINISH) {
+            analysisFile(file);
+        }
     }
 
-    public File getFile() {
+    /**
+     * 分析文件（主要是获取文件的hash值）
+     * @param file
+     */
+    private void analysisFile(File file) {
+        for (Client.ClientListener listener : listeners)
+            listener.onStateChange(TransmissionState.ANALYSIS);
+
+        // 发送文件信息给接收端
+
+        // 等待接收端回应的回调
+
+    }
+
+    public FileInfo getFileInfo() {
         return sendFile;
     }
 

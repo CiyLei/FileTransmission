@@ -9,7 +9,7 @@ import java.util.Vector;
 /**
  * 默认的配置信息
  */
-public class DefaultConfiguration implements Configuration {
+public class DefaultConfiguration extends Configuration {
 
     /**
      * 这里根据自身所有的ip，每个都遍历了后2个网段的所有ip
@@ -119,5 +119,14 @@ public class DefaultConfiguration implements Configuration {
     @Override
     public Integer broadcastPort() {
         return 8732;
+    }
+
+    /**
+     * 根据可用的处理器数量*2开启多线程扫描（测过来这个效率最高）
+     * @return
+     */
+    @Override
+    public Integer broadcastConcurrentCount() {
+        return Runtime.getRuntime().availableProcessors() * 2;
     }
 }

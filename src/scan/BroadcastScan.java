@@ -6,8 +6,6 @@ import send.SocketClient;
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * 采用udp广播的形式实现扫描设备
@@ -15,8 +13,6 @@ import java.util.concurrent.Executors;
 public class BroadcastScan implements Scan {
 
     private Configuration config;
-    // 根据可用的处理器数量*2开启多线程扫描（测过来这个效率最高）
-    private ExecutorService scanThreadPool;
     private boolean isScan;
     private List<Scan.ScanListener> listeners;
     // upd互相识别的字符串
@@ -28,7 +24,6 @@ public class BroadcastScan implements Scan {
 
     public BroadcastScan(Configuration configuration) throws SocketException {
         this.config = configuration;
-        scanThreadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
         isScan = false;
         listeners = new ArrayList<>();
         tasks = new HashMap<>();
@@ -41,7 +36,7 @@ public class BroadcastScan implements Scan {
         for (int i = 0; i < Runtime.getRuntime().availableProcessors() * 2; i++) {
             BroadcastScanTask task = new BroadcastScanTask(ips);
             this.tasks.put(task, false);
-            scanThreadPool.execute(task);
+            config.broadcastPool().execute(task);
         }
     }
 
