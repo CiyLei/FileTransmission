@@ -23,7 +23,6 @@ public class CommandSendFileInfoController implements AcceptController {
 
     public void sendFileInfo(FileInfo file) {
         try {
-            System.out.println("--" + serverIp + ":" + commandPort);
             if (commandSocket == null)
                 commandSocket = new Socket(serverIp, commandPort);
             if (commandDataOutputStream == null)
