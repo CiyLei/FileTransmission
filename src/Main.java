@@ -1,6 +1,7 @@
 import scan.Scan;
 import send.Client;
 
+import java.io.File;
 import java.net.SocketException;
 
 public class Main {
@@ -14,6 +15,7 @@ public class Main {
                     // getInetAddress().getHostAddress()是个阻塞方法，慎用
 //                    System.out.println("扫描到客户端：" + client.getInetAddress().getHostName() + "-" + client.getInetAddress().getHostAddress());
                     System.out.println("扫描到客户端：" + client.getInetAddress().getHostAddress());
+                    client.sendFile(new File(""));
                 }
 
                 @Override

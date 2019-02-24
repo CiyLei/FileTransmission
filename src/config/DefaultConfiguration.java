@@ -122,11 +122,46 @@ public class DefaultConfiguration extends Configuration {
     }
 
     /**
+     * 命令socket的端口
+     * @return
+     */
+    @Override
+    public Integer commandPort() {
+        return 8733;
+    }
+
+    /**
+     * 文件发送socket的端口
+     * @return
+     */
+    @Override
+    public Integer sendFilePort() {
+        return 8734;
+    }
+
+    /**
      * 根据可用的处理器数量*2开启多线程扫描（测过来这个效率最高）
      * @return
      */
     @Override
     public Integer broadcastConcurrentCount() {
         return Runtime.getRuntime().availableProcessors() * 2;
+    }
+
+    /**
+     * 发送一个文件用3个线程
+     * @return
+     */
+    @Override
+    public Integer sendFileTaskThreadCount() {
+        return 3;
+    }
+
+    /**
+     * 一次性最多发送5个文件
+     */
+    @Override
+    public Integer sendFileTaskMaxCount() {
+        return 5;
     }
 }

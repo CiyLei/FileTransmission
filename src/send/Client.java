@@ -22,7 +22,7 @@ public abstract class Client {
         listeners = new ArrayList<>();
     }
 
-    abstract void sendFile(File file);
+    public abstract void sendFile(File file);
 
     public InetAddress getInetAddress() {
         return inetAddress;

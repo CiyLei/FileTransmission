@@ -1,6 +1,7 @@
 package send;
 
 import config.Configuration;
+import utils.MD5Util;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -14,7 +15,7 @@ public class SocketClient extends Client {
     private double sendProgress;
     private TransmissionState sendState;
     // 命令管理socket
-    private CommandManager commandManager;
+    private CommandSendFileInfoController sendFileInfoController;
 
     public SocketClient(InetAddress inetAddress, Configuration configuration) {
         super(inetAddress, configuration);
@@ -29,13 +30,20 @@ public class SocketClient extends Client {
                 sendState = state;
             }
         });
-
+        sendFileInfoController = new CommandSendFileInfoController(inetAddress.getHostAddress());
     }
 
     @Override
-    void sendFile(File file) {
-        if (sendState == null || sendState == TransmissionState.FINISH) {
-            analysisFile(file);
+    public void sendFile(File file) {
+        if (file.exists()) {
+            if (sendState == null || sendState == TransmissionState.FINISH || sendState == TransmissionState.ERROR) {
+                if (sendFileInfoController.isSuccessInit()) {
+                    analysisFile(file);
+                } else {
+                    for (Client.ClientListener listener : listeners)
+                        listener.onStateChange(TransmissionState.ERROR);
+                }
+            }
         }
     }
 
@@ -46,10 +54,21 @@ public class SocketClient extends Client {
     private void analysisFile(File file) {
         for (Client.ClientListener listener : listeners)
             listener.onStateChange(TransmissionState.ANALYSIS);
-
-        // 发送文件信息给接收端
-
-        // 等待接收端回应的回调
+        configuration.commandPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String hash = MD5Util.md5HashCode(file.getPath());
+                    sendFile = new FileInfo(file, hash);
+                    // 发送文件信息给接收端
+                    sendFileInfoController.sendFileInfo(sendFile);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    for (Client.ClientListener listener : listeners)
+                        listener.onStateChange(TransmissionState.ERROR);
+                }
+            }
+        });
 
     }
 
