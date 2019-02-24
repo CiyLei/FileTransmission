@@ -5,7 +5,9 @@ import scan.Scan;
 import send.Client;
 import send.SocketClient;
 
+import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 
 public class FileTransmission {
 
@@ -35,7 +37,12 @@ public class FileTransmission {
      * @param ip
      * @return
      */
-    public Client getSocketClient(String ip) {
-        return new SocketClient(ip, configuration);
+    public Client getNewSocketClient(String ip) {
+        try {
+            return new SocketClient(InetAddress.getByName(ip), configuration);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

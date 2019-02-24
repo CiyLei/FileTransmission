@@ -11,7 +11,7 @@ public class Main {
             scan.addListener(new Scan.ScanListener() {
                 @Override
                 public void onGet(Client client) {
-                    System.out.println("扫描到客户端：" + client.getIp());
+                    System.out.println("扫描到客户端：" + client.getInetAddress().getHostName() + "-" + client.getInetAddress().getHostAddress());
                 }
 
                 @Override
