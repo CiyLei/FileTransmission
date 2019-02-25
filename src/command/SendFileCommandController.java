@@ -72,10 +72,13 @@ public class SendFileCommandController {
                 commandDataOutputStream.flush();
                 // 收到回复信息
                 String replyMsg = commandDatainputStream.readUTF();
-                //分析回复信息
-                analysisReplyMsg(replyMsg);
+                while (null != replyMsg && !replyMsg.isEmpty()) {
+                    //分析回复信息
+                    analysisReplyMsg(replyMsg);
+                    replyMsg = commandDatainputStream.readUTF();
+                }
             } catch (IOException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
                 try {
                     commandDataOutputStream.close();
                     commandDatainputStream.close();

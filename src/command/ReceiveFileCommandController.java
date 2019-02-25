@@ -35,17 +35,28 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
         try {
             // 收到文件信息
             commandDataInputStream = new DataInputStream(socket.getInputStream());
-            String data = commandDataInputStream.readUTF();
-            String[] split = data.split(",");
-            if (split.length > 0) {
-                switch (Integer.parseInt(split[0])) {
-                    case 1:
-                        obtainFileInfo(split);
-                        break;
-                }
+            String replyMsg = commandDataInputStream.readUTF();
+            while (null != replyMsg && !replyMsg.isEmpty()) {
+                analysisReplyMsg(replyMsg);
+                replyMsg = commandDataInputStream.readUTF();
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * 分析回复信息
+     * @param replyMsg
+     */
+    private void analysisReplyMsg(String replyMsg) {
+        String[] split = replyMsg.split(",");
+        if (split.length > 0) {
+            switch (Integer.parseInt(split[0])) {
+                case 1:
+                    obtainFileInfo(split);
+                    break;
+            }
         }
     }
 
