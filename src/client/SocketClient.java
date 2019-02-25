@@ -90,7 +90,7 @@ public class SocketClient extends Client {
      */
     private void startSendFile(Integer sendFilePort) {
         if (sendFile != null && !sendFile.getFileHashValue().isEmpty()) {
-            new SendFileSocketController(config, sendFile, sendFilePort).start();
+            new SendFileSocketController(config, sendFile, getHostAddress(), sendFilePort).start();
         }
     }
 }
