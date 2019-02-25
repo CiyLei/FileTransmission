@@ -28,7 +28,7 @@ public class SendFileSocketController {
             Long endIndex = (i + 1) * average - 1;
             // 最后一个全包了
             if (i == config.sendFileTaskThreadCount() - 1)
-                endIndex = fileInfo.getFile().length();
+                endIndex = fileInfo.getFile().length() - 1;
             config.sendFilePool().execute(new SendFileTask(fileInfo, i * average, endIndex, receiveAddress, receivePort));
         }
     }
@@ -85,9 +85,20 @@ public class SendFileSocketController {
                     // 再取文件发送数据
                     randomAccessFile.seek(startIndex);
                     byte[] buffer = new byte[1024 * 4];
-                    while (randomAccessFile.read(buffer) != -1) {
-                        dataOutputStream.write(buffer, 0, buffer.length);
-                        dataOutputStream.flush();
+                    while (true) {
+                        if (randomAccessFile.getFilePointer() + buffer.length - 1 <= endIndex) {
+                            if (randomAccessFile.read(buffer) != -1) {
+                                dataOutputStream.write(buffer);
+                                dataOutputStream.flush();
+                            }
+                        } else {
+                            buffer = new byte[(int) (endIndex - randomAccessFile.getFilePointer() + 1)];
+                            if (randomAccessFile.read(buffer) != -1) {
+                                dataOutputStream.write(buffer);
+                                dataOutputStream.flush();
+                            }
+                            break;
+                        }
                     }
                 } catch (IOException e) {
 //                    e.printStackTrace();
