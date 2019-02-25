@@ -79,20 +79,24 @@ public class SendFileCommandController {
                 }
             } catch (IOException e) {
 //                e.printStackTrace();
-                try {
-                    commandDataOutputStream.close();
-                    commandDatainputStream.close();
-                    commandSocket.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-                commandDataOutputStream = null;
-                commandDatainputStream = null;
-                commandSocket = null;
-                for (Client.ClientListener listener : client.getListeners())
-                    listener.onConnection(false);
+                colse();
             }
         }
+    }
+
+    public void colse() {
+        try {
+            commandDataOutputStream.close();
+            commandDatainputStream.close();
+            commandSocket.close();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        commandDataOutputStream = null;
+        commandDatainputStream = null;
+        commandSocket = null;
+        for (Client.ClientListener listener : client.getListeners())
+            listener.onConnection(false);
     }
 
     /**

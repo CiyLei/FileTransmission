@@ -1,5 +1,6 @@
 package command;
 
+import client.Client;
 import config.Configuration;
 
 import java.io.DataInputStream;
@@ -41,8 +42,25 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
                 replyMsg = commandDataInputStream.readUTF();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            colse();
         }
+    }
+
+    public void colse() {
+        try {
+            commandDataInputStream.close();
+            commandDataOutputStream.close();
+            socket.close();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        commandDataOutputStream = null;
+        commandDataInputStream = null;
+        socket = null;
+        Client client = config.getClient(socket.getInetAddress().getHostAddress(), socket.getLocalPort());
+        for (Client.ClientListener listener : client.getListeners())
+            listener.onConnection(false);
     }
 
     /**
