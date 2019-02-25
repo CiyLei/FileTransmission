@@ -115,7 +115,7 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
                 // 将接受文件的纪录保存下来
                 Client client = config.getClient(socket.getInetAddress().getHostAddress());
                 if (client != null) {
-                    config.addClient(client, currentTransmissionFIleInfo);
+                    config.addReceiveFileInfoOnClient(client, currentTransmissionFIleInfo);
                     commandDataOutputStream = new DataOutputStream(socket.getOutputStream());
                     commandDataOutputStream.writeUTF("2,1," + config.sendFilePort().toString());
                     commandDataOutputStream.flush();

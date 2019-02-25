@@ -70,6 +70,12 @@ public abstract class Client {
      */
     public abstract void receiveFileUpdate(TransmissionFileInfo transmissionFileInfo);
 
+    /**
+     * 设置发送文件的进度
+     * @param transmissionFileInfo
+     */
+    public abstract void sendFileUpdate(TransmissionFileInfo transmissionFileInfo);
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Client) {
@@ -93,6 +99,14 @@ public abstract class Client {
          * @param transmissionFileInfo
          */
         public void onReceiveFileUpdate(TransmissionFileInfo transmissionFileInfo) {}
+
+        /**
+         * 发送文件的进度回调
+         * @param transmissionFileInfo
+         */
+        public void onSendFileUpdate(TransmissionFileInfo transmissionFileInfo) {}
+
+
     }
 }
 

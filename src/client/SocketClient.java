@@ -91,6 +91,12 @@ public class SocketClient extends Client {
             listener.onReceiveFileUpdate(transmissionFileInfo);
     }
 
+    @Override
+    public void sendFileUpdate(TransmissionFileInfo transmissionFileInfo) {
+        for (Client.ClientListener listener : listeners)
+            listener.onSendFileUpdate(transmissionFileInfo);
+    }
+
     /**
      * 开始发送文件
      */

@@ -153,11 +153,10 @@ public abstract class Configuration {
      * 所以为了避免这个bug，我们将经过广播回复的客户端保存起来，在commandSocket过快，不在这个保存的客户端里面的时候，拒绝这个commandSocket
      * 同时也保存着接收文件的hash信息，保证并不是谁传给我我都收
      */
+    private Set<Client> clients = new HashSet<>();
 
-    private Map<Client, TransmissionFileInfo> clients = new HashMap<>();
-
-    public synchronized void addClient(Client client, TransmissionFileInfo transmissionFIleInfo) {
-        clients.put(client, transmissionFIleInfo);
+    public synchronized void addClient(Client client) {
+        clients.add(client);
     }
 
     /**
@@ -166,7 +165,7 @@ public abstract class Configuration {
      * @return
      */
     public synchronized Client getClient(String address){
-        for (Client client : clients.keySet()) {
+        for (Client client : clients) {
             if (client.getHostAddress().equals(address)) {
                 return client;
             }
@@ -175,12 +174,49 @@ public abstract class Configuration {
     }
 
     /**
-     * 验证文件之前是否确认接收过
+     * 记录了确认接收文件的客户端
+     */
+    private Map<Client, TransmissionFileInfo> receiveClient = new HashMap<>();
+
+    /**
+     * 添加确认接收文件的客户端
+     * @param client
+     * @param transmissionFileInfo
+     */
+    public synchronized void addReceiveFileInfoOnClient(Client client, TransmissionFileInfo transmissionFileInfo) {
+        receiveClient.put(client, transmissionFileInfo);
+    }
+
+    /**
+     * 返回此客户端同意发送的文件信息
      * @param client
      * @return
      */
-    public synchronized TransmissionFileInfo getTransmissionFileInfoForClient(Client client) {
-        return clients.get(client);
+    public synchronized TransmissionFileInfo getTransmissionFileInfoForReceiveClient(Client client) {
+        return receiveClient.get(client);
+    }
+
+    /**
+     * 保存着要发送文件的客户端
+     */
+    private Map<Client, TransmissionFileInfo> sendClient = new HashMap<>();
+
+    /**
+     * 添加要发送文件的客户端
+     * @param client
+     * @param transmissionFileInfo
+     */
+    public synchronized void addSendClient(Client client, TransmissionFileInfo transmissionFileInfo) {
+        sendClient.put(client, transmissionFileInfo);
+    }
+
+    /**
+     * 返回此客户端要发生的文件信息
+     * @param client
+     * @return
+     */
+    public synchronized TransmissionFileInfo getTransmissionFileInfoForSendClient(Client client) {
+        return sendClient.get(client);
     }
 
     /**

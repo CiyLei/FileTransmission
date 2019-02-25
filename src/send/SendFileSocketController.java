@@ -1,5 +1,6 @@
 package send;
 
+import client.Client;
 import client.FileInfo;
 import config.Configuration;
 
@@ -73,28 +74,47 @@ public class SendFileSocketController {
                 connection();
             if (isConnection()) {
                 try {
-                    // 先发送文件的hash,让接收端确认
-                    dataOutputStream.writeUTF(fileInfo.getFileHashValue());
-                    dataOutputStream.flush();
-                    // 先发送文件的开始索引
-                    dataOutputStream.writeLong(startIndex);
-                    dataOutputStream.flush();
-                    // 再取文件发送数据
-                    randomAccessFile.seek(startIndex);
-                    byte[] buffer = new byte[1024 * 4];
-                    while (true) {
-                        if (randomAccessFile.getFilePointer() + buffer.length - 1 <= endIndex) {
-                            if (randomAccessFile.read(buffer) != -1) {
-                                dataOutputStream.write(buffer);
-                                dataOutputStream.flush();
+                    Client client = config.getClient(socket.getInetAddress().getHostAddress());
+                    TransmissionFileInfo transmissionFileInfo = config.getTransmissionFileInfoForReceiveClient(client);
+                    if (client != null && transmissionFileInfo != null) {
+                        // 先发送文件的hash,让接收端确认
+                        dataOutputStream.writeUTF(fileInfo.getFileHashValue());
+                        dataOutputStream.flush();
+                        // 先发送文件的开始索引
+                        dataOutputStream.writeLong(startIndex);
+                        dataOutputStream.flush();
+                        // 再取文件发送数据
+                        randomAccessFile.seek(startIndex);
+                        byte[] buffer = new byte[1024 * 4];
+                        // 保持一段时间再更新一下
+                        Long ct = System.currentTimeMillis();
+                        Long sunSize = 0l;
+                        while (true) {
+                            if (randomAccessFile.getFilePointer() + buffer.length - 1 <= endIndex) {
+                                if (randomAccessFile.read(buffer) != -1) {
+                                    dataOutputStream.write(buffer);
+                                    dataOutputStream.flush();
+
+                                    sunSize += buffer.length;
+                                    if (System.currentTimeMillis() - ct >= config.sendFileUpdateFrequency()) {
+                                        transmissionFileInfo.addSize(sunSize);
+                                        client.sendFileUpdate(transmissionFileInfo);
+                                        ct = System.currentTimeMillis();
+                                        sunSize = 0l;
+                                    }
+                                }
+                            } else {
+                                buffer = new byte[(int) (endIndex - randomAccessFile.getFilePointer() + 1)];
+                                if (randomAccessFile.read(buffer) != -1) {
+                                    dataOutputStream.write(buffer);
+                                    dataOutputStream.flush();
+                                    if (sunSize > 0) {
+                                        transmissionFileInfo.addSize(sunSize);
+                                        client.sendFileUpdate(transmissionFileInfo);
+                                    }
+                                }
+                                break;
                             }
-                        } else {
-                            buffer = new byte[(int) (endIndex - randomAccessFile.getFilePointer() + 1)];
-                            if (randomAccessFile.read(buffer) != -1) {
-                                dataOutputStream.write(buffer);
-                                dataOutputStream.flush();
-                            }
-                            break;
                         }
                     }
                 } catch (IOException e) {

@@ -26,6 +26,11 @@ public class Main {
                         public void onReceiveFileUpdate(TransmissionFileInfo transmissionFileInfo) {
                             System.out.println("接收文件:" + transmissionFileInfo.getFileName() + " 进度:" + transmissionFileInfo.getProgress());
                         }
+
+                        @Override
+                        public void onSendFileUpdate(TransmissionFileInfo transmissionFileInfo) {
+                            System.out.println("发送文件:" + transmissionFileInfo.getFileName() + " 进度:" + transmissionFileInfo.getProgress());
+                        }
                     });
 //                    try {
 //                        Thread.sleep(1000);

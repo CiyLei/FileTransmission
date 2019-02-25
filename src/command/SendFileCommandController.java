@@ -3,6 +3,7 @@ package command;
 import config.Configuration;
 import client.Client;
 import client.FileInfo;
+import send.TransmissionFileInfo;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -112,6 +113,10 @@ public class SendFileCommandController {
                         Boolean accept = split[1].trim().equals("1");
                         Integer sendFilePort = Integer.parseInt(split[2]);
                         client.replyIsAccept(accept, sendFilePort);
+                        if (accept) {
+                            // 同意的话就记录下来，再后来传输的时候取
+                            config.addSendClient(client, new TransmissionFileInfo(client.getSendFile().getFile().getName(), client.getSendFile().getFile().length(), client.getSendFile().getFileHashValue()));
+                        }
                     }
                     break;
             }
