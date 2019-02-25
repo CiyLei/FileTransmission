@@ -1,13 +1,14 @@
-package send;
+package command;
 
 import config.Configuration;
+import client.Client;
+import client.FileInfo;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Base64;
-import java.util.List;
 
 /**
  * 发送文件信息管理

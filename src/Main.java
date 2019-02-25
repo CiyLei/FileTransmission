@@ -1,5 +1,5 @@
 import scan.Scan;
-import send.Client;
+import client.Client;
 
 import java.io.File;
 import java.io.IOException;

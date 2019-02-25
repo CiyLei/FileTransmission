@@ -2,11 +2,11 @@ import config.Configuration;
 import config.DefaultConfiguration;
 import scan.BroadcastScan;
 import scan.Scan;
-import send.Client;
-import send.SocketClient;
-import server.AcceptController;
-import server.CommandListener;
-import server.CommandServerSocket;
+import client.Client;
+import client.SocketClient;
+import command.AcceptController;
+import command.CommandListener;
+import command.CommandServerSocket;
 
 import java.io.IOException;
 

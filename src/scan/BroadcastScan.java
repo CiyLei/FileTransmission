@@ -1,7 +1,7 @@
 package scan;
 
 import config.Configuration;
-import send.SocketClient;
+import client.SocketClient;
 
 import java.io.IOException;
 import java.net.*;

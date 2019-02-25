@@ -1,7 +1,7 @@
 package config;
 
-import send.Client;
-import server.CommandListener;
+import client.Client;
+import command.CommandListener;
 
 import java.util.HashSet;
 import java.util.Set;

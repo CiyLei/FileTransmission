@@ -1,4 +1,4 @@
-package server;
+package command;
 
 /**
  * 命令的监听

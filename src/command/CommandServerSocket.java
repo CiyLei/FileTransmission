@@ -1,8 +1,7 @@
-package server;
+package command;
 
 import config.Configuration;
-import send.Client;
-import send.ReceiveFileCommandController;
+import client.Client;
 
 import java.io.IOException;
 import java.net.ServerSocket;

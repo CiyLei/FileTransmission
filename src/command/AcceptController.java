@@ -1,4 +1,4 @@
-package server;
+package command;
 
 /**
  * 是否同意接收文件的控制器

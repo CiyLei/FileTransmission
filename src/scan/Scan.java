@@ -1,6 +1,6 @@
 package scan;
 
-import send.Client;
+import client.Client;
 
 import java.net.SocketException;
 

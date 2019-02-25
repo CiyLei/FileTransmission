@@ -1,5 +1,6 @@
-package send;
+package client;
 
+import command.SendFileCommandController;
 import config.Configuration;
 import utils.MD5Util;
 
@@ -75,5 +76,15 @@ public class SocketClient extends Client {
     @Override
     public void replyIsAccept(Boolean accept) {
         config.getListener().onAcceptListener(accept);
+        if (accept) {
+            startSendFile();
+        }
+    }
+
+    /**
+     * 开始发送文件
+     */
+    private void startSendFile() {
+
     }
 }

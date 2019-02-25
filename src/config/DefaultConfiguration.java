@@ -1,13 +1,12 @@
 package config;
 
-import server.CommandListener;
+import command.CommandListener;
 
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
-import java.util.concurrent.ExecutorService;
 
 /**
  * 默认的配置信息

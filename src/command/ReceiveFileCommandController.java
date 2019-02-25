@@ -1,7 +1,6 @@
-package send;
+package command;
 
 import config.Configuration;
-import server.AcceptController;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

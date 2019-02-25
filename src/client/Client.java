@@ -1,4 +1,4 @@
-package send;
+package client;
 
 import config.Configuration;
 
