@@ -27,7 +27,7 @@ public class ReceiveFileSocketController implements Runnable{
             dataInputStream = new DataInputStream(socket.getInputStream());
             String fileHash = dataInputStream.readUTF();
             Client client = config.getClient(socket.getInetAddress().getHostAddress());
-            TransmissionFileInfo transmissionFileInfo = config.getTransmissionFileInfoForReceiveClient(client);
+            TransmissionFileInfo transmissionFileInfo = config.getTransmissionFileInfoForSendClient(client);
             // 根据文件hash值确保文件之前被确认接收过
             if (transmissionFileInfo != null) {
                 Long startIndex = dataInputStream.readLong();
