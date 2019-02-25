@@ -33,6 +33,7 @@ public class ReceiveFileSocketController implements Runnable{
                 String fileName = new String(Base64.getDecoder().decode(dataInputStream.readUTF()), config.stringEncode());
                 Long startIndex = dataInputStream.readLong();
 //                System.out.println(this + " start:" + startIndex);
+                createSaveFilePath(config.saveFilePath());
                 File file = new File(config.saveFilePath() + fileName);
                 randomAccessFile = new RandomAccessFile(file, "rwd");
                 randomAccessFile.seek(startIndex);
@@ -45,5 +46,15 @@ public class ReceiveFileSocketController implements Runnable{
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 创建默认保存文件的目录
+     * @param path
+     */
+    private synchronized void createSaveFilePath(String path) {
+        File p = new File(path);
+        if (!p.exists())
+            p.mkdirs();
     }
 }
