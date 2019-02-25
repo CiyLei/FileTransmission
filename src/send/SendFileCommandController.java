@@ -7,6 +7,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Base64;
+import java.util.List;
 
 /**
  * 发送文件信息管理
@@ -25,35 +26,62 @@ public class SendFileCommandController {
     private String serverIp;
     private Integer commandPort;
     private Configuration config;
+    private List<Client.ClientListener> listeners;
 
-    public SendFileCommandController(String serverIp, Integer commandPort, Configuration config) {
+    public SendFileCommandController(String serverIp, Integer commandPort, Configuration config, List<Client.ClientListener> listeners) {
         this.serverIp = serverIp;
         this.commandPort = commandPort;
         this.config = config;
+        this.listeners = listeners;
+        connection();
+    }
+
+    private void connection() {
+        try {
+            commandSocket = new Socket(serverIp, commandPort);
+            commandDataOutputStream = new DataOutputStream(commandSocket.getOutputStream());
+            commandDatainputStream = new DataInputStream(commandSocket.getInputStream());
+            for (Client.ClientListener listener : listeners)
+                listener.onConnection(true);
+        } catch (IOException e) {
+            e.printStackTrace();
+            for (Client.ClientListener listener : listeners)
+                listener.onConnection(false);
+        }
+    }
+
+    public Boolean isConnection() {
+        return commandSocket != null && commandSocket.isConnected() && commandDatainputStream != null && commandDataOutputStream != null;
     }
 
     public void sendFileInfo(FileInfo file) {
-        try {
-            if (commandSocket == null)
-                commandSocket = new Socket(serverIp, commandPort);
-            if (commandDataOutputStream == null)
-                commandDataOutputStream = new DataOutputStream(commandSocket.getOutputStream());
-            if (commandDatainputStream == null)
-                commandDatainputStream = new DataInputStream(commandSocket.getInputStream());
-            // 发送文件信息
-            String fileName = file.getFile().getName();
-            String fileSize = String.valueOf(file.getFile().length());
-            String fileHash = file.getFileHashValue();
-            String data = "1," + Base64.getEncoder().encodeToString(fileName.getBytes("utf-8")) + "," + fileSize + "," + fileHash;
-            commandDataOutputStream.writeUTF(data);
-            commandDataOutputStream.flush();
-            System.out.println("发送了文件信息 name：" + fileName + " size:" + fileSize + " hash:" + fileHash);
-            // 收到回复信息
-            String replyMsg = commandDatainputStream.readUTF();
-            //分析回复信息
-            analysisReplyMsg(replyMsg);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (!isConnection())
+            connection();
+        if (isConnection()) {
+            try {
+                // 发送文件信息
+                String fileName = file.getFile().getName();
+                String fileSize = String.valueOf(file.getFile().length());
+                String fileHash = file.getFileHashValue();
+                String data = "1," + Base64.getEncoder().encodeToString(fileName.getBytes("utf-8")) + "," + fileSize + "," + fileHash;
+                commandDataOutputStream.writeUTF(data);
+                commandDataOutputStream.flush();
+                // 收到回复信息
+                String replyMsg = commandDatainputStream.readUTF();
+                //分析回复信息
+                analysisReplyMsg(replyMsg);
+            } catch (IOException e) {
+                e.printStackTrace();
+                try {
+                    commandDataOutputStream.close();
+                    commandDatainputStream.close();
+                    commandSocket.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+                for (Client.ClientListener listener : listeners)
+                    listener.onConnection(false);
+            }
         }
     }
 

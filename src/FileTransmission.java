@@ -9,8 +9,6 @@ import server.CommandListener;
 import server.CommandServerSocket;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 public class FileTransmission implements CommandListener {
 

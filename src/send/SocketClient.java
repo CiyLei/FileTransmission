@@ -11,8 +11,6 @@ import java.io.File;
 public class SocketClient extends Client {
 
     private FileInfo sendFile;
-//    private double sendProgress;
-//    private TransmissionState sendState;
     // 命令管理socket
     private SendFileCommandController sendFileInfoController;
 
@@ -25,26 +23,12 @@ public class SocketClient extends Client {
      */
     public SocketClient(String hostAddress, String hostName, Integer commandPort, Configuration configuration) {
         super(hostAddress, hostName, commandPort, configuration);
-//        addListener(new ClientListener() {
-//            @Override
-//            void onProgress(double progress) {
-//                sendProgress = progress;
-//            }
-//
-//            @Override
-//            void onStateChange(TransmissionState state) {
-//                sendState = state;
-//            }
-//        });
-        sendFileInfoController = new SendFileCommandController(hostAddress, commandPort, configuration);
+        sendFileInfoController = new SendFileCommandController(hostAddress, commandPort, configuration, listeners);
     }
 
     @Override
     public void sendFile(File file) {
         if (file.exists()) {
-//            if (sendState == null || sendState == TransmissionState.FINISH || sendState == TransmissionState.ERROR) {
-//                analysisFile(file);
-//            }
             analysisFile(file);
         }
     }
@@ -54,8 +38,6 @@ public class SocketClient extends Client {
      * @param file
      */
     private void analysisFile(File file) {
-//        for (Client.ClientListener listener : listeners)
-//            listener.onStateChange(TransmissionState.ANALYSIS);
         configuration.commandPool().execute(new Runnable() {
             @Override
             public void run() {
@@ -78,11 +60,7 @@ public class SocketClient extends Client {
         return sendFile;
     }
 
-//    public double getProgress() {
-//        return sendProgress;
-//    }
-//
-//    public TransmissionState getState() {
-//        return sendState;
-//    }
+    public Boolean isConnection() {
+        return sendFileInfoController.isConnection();
+    }
 }

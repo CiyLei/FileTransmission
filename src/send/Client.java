@@ -3,6 +3,8 @@ package send;
 import config.Configuration;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 客户端的一个抽象，用此对象进行文件的发送
@@ -13,14 +15,14 @@ public abstract class Client {
     private String hostName;
     private Integer commandPort;
     Configuration configuration;
-//    List<ClientListener> listeners;
+    List<ClientListener> listeners;
 
     public Client(String hostAddress, String hostName, Integer commandPort, Configuration configuration) {
         this.hostAddress = hostAddress;
         this.hostName = hostName;
         this.commandPort = commandPort;
         this.configuration = configuration;
-//        listeners = new ArrayList<>();
+        listeners = new ArrayList<>();
     }
 
     public abstract void sendFile(File file);
@@ -36,40 +38,21 @@ public abstract class Client {
     public Integer getCommandPort() {
         return commandPort;
     }
-//    public void addListener(ClientListener listener) {
-//        this.listeners.add(listener);
-//    }
-//
-//    /**
-//     * 传输中的回调
-//     */
-//    public abstract class ClientListener {
-//        /**
-//         * 接收端是否同意
-//         * @param accept
-//         */
-//        void onAccept(Boolean accept) {}
-//
-//        /**
-//         * 发送进度
-//         * @param progress
-//         */
-//        void onProgress(double progress) {}
-//
-//        /**
-//         * 开始传输的过程中改变状态的回调
-//         * @param state
-//         */
-//        void onStateChange(TransmissionState state) {}
-//    }
-//
-//    @Override
-//    public boolean equals(Object obj) {
-//        if (obj instanceof Client) {
-//            return inetAddress.getHostAddress().equals(((Client) obj).inetAddress.getHostAddress());
-//        }
-//        return super.equals(obj);
-//    }
+
+    public void addListener(ClientListener listener) {
+        this.listeners.add(listener);
+    }
+
+    /**
+     * 传输中的回调
+     */
+    public abstract static class ClientListener {
+        /**
+         * 是否连接成功
+         * @param connection
+         */
+        public void onConnection(Boolean connection) {}
+    }
 }
 
 /**

@@ -130,7 +130,7 @@ public abstract class Configuration {
         if (null == commandPoolInstance) {
             synchronized (Configuration.class) {
                 if (null == commandPoolInstance) {
-                    commandPoolInstance = Executors.newFixedThreadPool(sendFileTaskMaxCount() * 2 + 1);
+                    commandPoolInstance = Executors.newCachedThreadPool();
                 }
             }
         }
