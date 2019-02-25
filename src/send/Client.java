@@ -43,6 +43,10 @@ public abstract class Client {
         this.listeners.add(listener);
     }
 
+    public abstract Boolean isConnection();
+
+    public abstract void connection();
+
     /**
      * 传输中的回调
      */

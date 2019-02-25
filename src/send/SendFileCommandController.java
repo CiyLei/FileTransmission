@@ -33,13 +33,16 @@ public class SendFileCommandController {
         this.commandPort = commandPort;
         this.config = config;
         this.listeners = listeners;
-        connection();
+//        connection();
     }
 
-    private void connection() {
+    public void connection() {
         try {
-            commandSocket = new Socket(serverIp, commandPort);
-            commandDataOutputStream = new DataOutputStream(commandSocket.getOutputStream());
+            if (commandSocket == null || commandSocket.isClosed())
+                commandSocket = new Socket(serverIp, commandPort);
+            if (commandDataOutputStream == null)
+                commandDataOutputStream = new DataOutputStream(commandSocket.getOutputStream());
+            if (commandDatainputStream == null)
             commandDatainputStream = new DataInputStream(commandSocket.getInputStream());
             for (Client.ClientListener listener : listeners)
                 listener.onConnection(true);
@@ -79,6 +82,9 @@ public class SendFileCommandController {
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
+                commandDataOutputStream = null;
+                commandDatainputStream = null;
+                commandSocket = null;
                 for (Client.ClientListener listener : listeners)
                     listener.onConnection(false);
             }

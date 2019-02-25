@@ -22,7 +22,7 @@ public class Main {
                         }
                     });
                     File file = new File("/Users/chenlei/Documents/Postman_v4.1.3/icon_32.png");
-                    System.out.println("发送了文件信息 name：" + file.getName() + " size:" + file.length());
+                    System.out.println("开始发送文件信息 name：" + file.getName() + " size:" + file.length());
                     client.sendFile(file);
                 }
 
@@ -31,7 +31,7 @@ public class Main {
                     System.out.println("扫描完毕");
                 }
             });
-            scan.startScan();
+//            scan.startScan();
         } catch (IOException e) {
             e.printStackTrace();
         }

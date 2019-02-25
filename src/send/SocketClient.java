@@ -60,7 +60,13 @@ public class SocketClient extends Client {
         return sendFile;
     }
 
+    @Override
     public Boolean isConnection() {
         return sendFileInfoController.isConnection();
+    }
+
+    @Override
+    public void connection() {
+        sendFileInfoController.connection();
     }
 }
