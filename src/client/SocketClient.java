@@ -2,6 +2,7 @@ package client;
 
 import command.SendFileCommandController;
 import config.Configuration;
+import send.SendFileSocketController;
 import utils.MD5Util;
 
 import java.io.File;
@@ -51,8 +52,6 @@ public class SocketClient extends Client {
                     sendFileInfoController.sendFileInfo(sendFile);
                 } catch (Exception e) {
                     e.printStackTrace();
-//                    for (Client.ClientListener listener : listeners)
-//                        listener.onStateChange(TransmissionState.ERROR);
                 }
             }
         });
@@ -73,18 +72,25 @@ public class SocketClient extends Client {
         sendFileInfoController.connection();
     }
 
+    /**
+     * 回复是否同意接收文件
+     * @param accept
+     * @return
+     */
     @Override
-    public void replyIsAccept(Boolean accept) {
+    public void replyIsAccept(Boolean accept, Integer sendFilePort) {
         config.getListener().onAcceptListener(accept);
         if (accept) {
-            startSendFile();
+            startSendFile(sendFilePort);
         }
     }
 
     /**
      * 开始发送文件
      */
-    private void startSendFile() {
-
+    private void startSendFile(Integer sendFilePort) {
+        if (sendFile != null && !sendFile.getFileHashValue().isEmpty()) {
+            new SendFileSocketController(config, sendFile).start();
+        }
     }
 }

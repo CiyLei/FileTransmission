@@ -15,9 +15,9 @@ import java.util.Base64;
  * 2端之间的通信命令如下
  *
  * type,data...
- * type为1则表示发送文件信息:                                1,Base64(文件名),文件大小,文件hash值
- * type为2则表示确认是否接收(data为0表示拒绝，1表示接收):       2,1
- * type为3则表示暂停或者开始任务(data为0表示暂停，1表示开始):   3,0
+ * type为1则表示发送文件信息:                                                                      1,Base64(文件名),文件大小,文件hash值
+ * type为2则表示确认是否接收(第2位0表示拒绝，1表示接收。第3位表示发送文件的端口号，拒绝的就传0):       2,1,2333
+ * type为3则表示暂停或者开始任务(data为0表示暂停，1表示开始):                                        3,0
  */
 public class ReceiveFileCommandController implements Runnable, AcceptController {
 
@@ -105,7 +105,7 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
     public void accept() {
         try {
             commandDataOutputStream = new DataOutputStream(socket.getOutputStream());
-            commandDataOutputStream.writeUTF("2,1");
+            commandDataOutputStream.writeUTF("2,1," + config.sendFilePort().toString());
             commandDataOutputStream.flush();
         } catch (IOException e) {
             e.printStackTrace();
@@ -119,7 +119,7 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
     public void reject() {
         try {
             commandDataOutputStream = new DataOutputStream(socket.getOutputStream());
-            commandDataOutputStream.writeUTF("2,0");
+            commandDataOutputStream.writeUTF("2,0,0");
             commandDataOutputStream.flush();
         } catch (IOException e) {
             e.printStackTrace();

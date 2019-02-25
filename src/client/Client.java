@@ -56,7 +56,7 @@ public abstract class Client {
      * @param accept
      * @return
      */
-    public abstract void replyIsAccept(Boolean accept);
+    public abstract void replyIsAccept(Boolean accept, Integer sendFilePort);
 
     @Override
     public boolean equals(Object obj) {

@@ -166,7 +166,7 @@ public class DefaultConfiguration extends Configuration {
      */
     @Override
     public Integer commandPort() {
-        return 8733;
+        return 8736;
     }
 
     /**
