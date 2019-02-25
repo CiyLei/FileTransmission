@@ -48,6 +48,9 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
     }
 
     public void colse() {
+        Client client = config.getClient(socket.getInetAddress().getHostAddress(), socket.getLocalPort());
+        for (Client.ClientListener listener : client.getListeners())
+            listener.onConnection(false);
         try {
             commandDataInputStream.close();
             commandDataOutputStream.close();
@@ -58,9 +61,6 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
         commandDataOutputStream = null;
         commandDataInputStream = null;
         socket = null;
-        Client client = config.getClient(socket.getInetAddress().getHostAddress(), socket.getLocalPort());
-        for (Client.ClientListener listener : client.getListeners())
-            listener.onConnection(false);
     }
 
     /**
