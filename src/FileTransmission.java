@@ -44,16 +44,13 @@ public class FileTransmission implements CommandListener {
 
     /**
      * 如果需要自己指定ip发送文件的话，用这个方法获取client对象再发送文件
-     * @param ip
+     * @param hostAddress
+     * @param hostName
+     * @param commandPort
      * @return
      */
-    public Client getNewSocketClient(String ip) {
-        try {
-            return new SocketClient(InetAddress.getByName(ip), configuration);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public Client getNewSocketClient(String hostAddress, String hostName, Integer commandPort) {
+        return new SocketClient(hostAddress, hostName, commandPort, configuration);
     }
 
     @Override

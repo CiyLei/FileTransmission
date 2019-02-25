@@ -3,31 +3,39 @@ package send;
 import config.Configuration;
 
 import java.io.File;
-import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 客户端的一个抽象，用此对象进行文件的发送
  */
 public abstract class Client {
 
-    InetAddress inetAddress;
+    private String hostAddress;
+    private String hostName;
+    private Integer commandPort;
     Configuration configuration;
 //    List<ClientListener> listeners;
 
-    public Client(InetAddress inetAddress, Configuration configuration) {
-        this.inetAddress = inetAddress;
+    public Client(String hostAddress, String hostName, Integer commandPort, Configuration configuration) {
+        this.hostAddress = hostAddress;
+        this.hostName = hostName;
+        this.commandPort = commandPort;
         this.configuration = configuration;
 //        listeners = new ArrayList<>();
     }
 
     public abstract void sendFile(File file);
 
-    public InetAddress getInetAddress() {
-        return inetAddress;
+    public String getHostAddress() {
+        return hostAddress;
     }
 
+    public String getHostName() {
+        return hostName;
+    }
+
+    public Integer getCommandPort() {
+        return commandPort;
+    }
 //    public void addListener(ClientListener listener) {
 //        this.listeners.add(listener);
 //    }

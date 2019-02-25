@@ -4,7 +4,6 @@ import config.Configuration;
 import utils.MD5Util;
 
 import java.io.File;
-import java.net.InetAddress;
 
 /**
  * 采用socket方式连接设备和发送数据
@@ -17,8 +16,15 @@ public class SocketClient extends Client {
     // 命令管理socket
     private SendFileCommandController sendFileInfoController;
 
-    public SocketClient(InetAddress inetAddress, Configuration configuration) {
-        super(inetAddress, configuration);
+    /**
+     * Socket对象
+     * @param hostAddress   对方ip地址
+     * @param hostName      对方名称
+     * @param commandPort   对方command的端口
+     * @param configuration 自己的配置信息
+     */
+    public SocketClient(String hostAddress, String hostName, Integer commandPort, Configuration configuration) {
+        super(hostAddress, hostName, commandPort, configuration);
 //        addListener(new ClientListener() {
 //            @Override
 //            void onProgress(double progress) {
@@ -30,7 +36,7 @@ public class SocketClient extends Client {
 //                sendState = state;
 //            }
 //        });
-        sendFileInfoController = new SendFileCommandController(inetAddress.getHostAddress(), configuration);
+        sendFileInfoController = new SendFileCommandController(hostAddress, commandPort, configuration);
     }
 
     @Override

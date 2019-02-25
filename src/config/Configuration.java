@@ -25,6 +25,12 @@ public abstract class Configuration {
     }
 
     /**
+     * 获取自己名称
+     * @return
+     */
+    public abstract String selfHostName();
+
+    /**
      * 需要扫描的网络ip
      * @return
      */
@@ -75,6 +81,18 @@ public abstract class Configuration {
         }
         return broadcastPoolInstance;
     }
+
+    /**
+     * 广播发送标志
+     * @return
+     */
+    public abstract String broadcastSendTag();
+
+    /**
+     * 广播回复的标志
+     * @return
+     */
+    public abstract String broadcastReceiveTag();
 
     /**
      * 发送一个文件用多少个线程

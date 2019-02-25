@@ -23,17 +23,19 @@ public class SendFileCommandController {
     private DataOutputStream commandDataOutputStream;
     private DataInputStream commandDatainputStream;
     private String serverIp;
+    private Integer commandPort;
     private Configuration config;
 
-    public SendFileCommandController(String serverIp, Configuration config) {
+    public SendFileCommandController(String serverIp, Integer commandPort, Configuration config) {
         this.serverIp = serverIp;
+        this.commandPort = commandPort;
         this.config = config;
     }
 
     public void sendFileInfo(FileInfo file) {
         try {
             if (commandSocket == null)
-                commandSocket = new Socket(serverIp, config.commandPort());
+                commandSocket = new Socket(serverIp, commandPort);
             if (commandDataOutputStream == null)
                 commandDataOutputStream = new DataOutputStream(commandSocket.getOutputStream());
             if (commandDatainputStream == null)

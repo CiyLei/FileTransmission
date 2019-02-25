@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.ExecutorService;
 
 /**
  * 默认的配置信息
@@ -15,6 +16,30 @@ public class DefaultConfiguration extends Configuration {
 
     public DefaultConfiguration(CommandListener listener) {
         super(listener);
+    }
+
+    /**
+     * 获取自己名称
+     * @return
+     */
+
+    private static volatile String hostName;
+
+    @Override
+    public String selfHostName() {
+        if (null == hostName) {
+            synchronized (DefaultConfiguration.class) {
+                if (null == hostName) {
+                    try {
+                        hostName = InetAddress.getLocalHost().getHostName();
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                        hostName = "";
+                    }
+                }
+            }
+        }
+        return hostName;
     }
 
     /**
@@ -161,6 +186,24 @@ public class DefaultConfiguration extends Configuration {
     @Override
     public Integer broadcastConcurrentCount() {
         return Runtime.getRuntime().availableProcessors() * 2;
+    }
+
+    /**
+     * 广播发送标志
+     * @return
+     */
+    @Override
+    public String broadcastSendTag() {
+        return "FileTransmission_Broadcast_SEND";
+    }
+
+    /**
+     * 广播回复的标志
+     * @return
+     */
+    @Override
+    public String broadcastReceiveTag() {
+        return "FileTransmission_Broadcast_RECEIVE";
     }
 
     /**

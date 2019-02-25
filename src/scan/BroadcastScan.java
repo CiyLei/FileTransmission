@@ -9,16 +9,13 @@ import java.util.*;
 
 /**
  * 采用udp广播的形式实现扫描设备
+ *  发送和回复的规则：TAG,Base64(名称),command端口号
  */
 public class BroadcastScan implements Scan {
 
     private Configuration config;
     private boolean isScan;
     private List<Scan.ScanListener> listeners;
-    // upd互相识别的字符串
-    public static String TAG_SEND = "FileTransmission_Broadcast_SEND";
-    // 回复的标志
-    public static String TAG_RECEIVE = "FileTransmission_Broadcast_RECEIVE";
     // 保存所有线程是否完成的信息
     private Map<BroadcastScanTask, Boolean> tasks;
 
@@ -62,6 +59,15 @@ public class BroadcastScan implements Scan {
     }
 
     /**
+     * 组装广播的内容
+     * @param tag
+     * @return
+     */
+    public String getContent(String tag) {
+        return tag + "," + Base64.getEncoder().encodeToString(config.selfHostName().getBytes()) + "," + config.commandPort().toString();
+    }
+
+    /**
      * 扫描任务
      */
     private class BroadcastScanTask implements Runnable {
@@ -98,12 +104,13 @@ public class BroadcastScan implements Scan {
         private void sendBroadcast(String ip) {
 //            System.out.println("扫描:" + ip);
             try {
+                String data = getContent(config.broadcastSendTag());
                 InetAddress address = InetAddress.getByName(ip);
                 //指定包要发送的目的地
-                DatagramPacket request = new DatagramPacket(BroadcastScan.TAG_SEND.getBytes(), BroadcastScan.TAG_SEND.getBytes().length, address, config.broadcastPort());
+                DatagramPacket request = new DatagramPacket(data.getBytes(), data.getBytes().length, address, config.broadcastPort());
                 socket.send(request);
-                if (retryCount > 0)
-                    System.out.println("重试了:" + retryCount);
+//                if (retryCount > 0)
+//                    System.out.println("重试了:" + retryCount);
                 retryCount = 0;
             } catch (IOException e) {
 //                e.printStackTrace();
@@ -133,13 +140,20 @@ public class BroadcastScan implements Scan {
                 try {
                     serverSocket.receive(datagramPacket);
                     String respone = new String(datagramPacket.getData(), 0, datagramPacket.getLength()).trim();
-                    for (Scan.ScanListener listener : listeners) {
-//                        System.out.println(respone);
-                        listener.onGet(new SocketClient(datagramPacket.getAddress(), config));
-                    }
-                    // 如果是接受到广播的话，就进行回复,否则的话就是回复广播，不理他
-                    if (respone.equals(TAG_SEND)) {
-                        reply(datagramPacket.getAddress().getHostAddress());
+                    if (respone.startsWith(config.broadcastSendTag()) || respone.startsWith(config.broadcastReceiveTag())) {
+                        String[] split = respone.split(",");
+                        if (split.length == 3) {
+                            String hostName = split[1];
+                            Integer port = Integer.parseInt(split[2]);
+                            for (Scan.ScanListener listener : listeners) {
+//                              System.out.println(respone);
+                                listener.onGet(new SocketClient(datagramPacket.getAddress().getHostAddress(), hostName, port, config));
+                            }
+                            // 如果是接受到广播的话，就进行回复,否则的话就是回复广播，不理他
+                            if (respone.startsWith(config.broadcastSendTag())) {
+                                reply(datagramPacket.getAddress().getHostAddress());
+                            }
+                        }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -153,9 +167,10 @@ public class BroadcastScan implements Scan {
          */
         private void reply(String host) {
             try {
+                String data = getContent(config.broadcastReceiveTag());
                 InetAddress address = InetAddress.getByName(host);
                 DatagramSocket socket = new DatagramSocket(0);
-                DatagramPacket request = new DatagramPacket(BroadcastScan.TAG_RECEIVE.getBytes(), BroadcastScan.TAG_RECEIVE.getBytes().length, address, config.broadcastPort());
+                DatagramPacket request = new DatagramPacket(data.getBytes(), data.getBytes().length, address, config.broadcastPort());
                 socket.send(request);
             } catch (Exception e) {
                 e.printStackTrace();
