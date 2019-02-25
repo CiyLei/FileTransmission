@@ -143,7 +143,7 @@ public class BroadcastScan implements Scan {
                     if (respone.startsWith(config.broadcastSendTag()) || respone.startsWith(config.broadcastReceiveTag())) {
                         String[] split = respone.split(",");
                         if (split.length == 3) {
-                            String hostName = split[1];
+                            String hostName = new String(Base64.getDecoder().decode(split[1]), "utf-8");
                             Integer port = Integer.parseInt(split[2]);
                             for (Scan.ScanListener listener : listeners) {
 //                              System.out.println(respone);
