@@ -75,7 +75,7 @@ public class SendFileSocketController {
             if (isConnection()) {
                 try {
                     Client client = config.getClient(socket.getInetAddress().getHostAddress());
-                    TransmissionFileInfo transmissionFileInfo = config.getTransmissionFileInfoForReceiveClient(client);
+                    TransmissionFileInfo transmissionFileInfo = config.getTransmissionFileInfoForSendClient(client);
                     if (client != null && transmissionFileInfo != null) {
                         // 先发送文件的hash,让接收端确认
                         dataOutputStream.writeUTF(fileInfo.getFileHashValue());
