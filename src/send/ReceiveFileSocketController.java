@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.Socket;
-import java.util.Base64;
 
 public class ReceiveFileSocketController implements Runnable{
 
@@ -47,13 +46,15 @@ public class ReceiveFileSocketController implements Runnable{
                     sunSize += len;
                     if (System.currentTimeMillis() - ct >= config.sendFileUpdateFrequency()) {
                         transmissionFileInfo.addSize(sunSize);
-                        client.sendFileUpdate(transmissionFileInfo);
+                        client.receiveFileUpdate(transmissionFileInfo);
                         ct = System.currentTimeMillis();
                         sunSize = 0l;
                     }
                 }
-                if (sunSize > 0l)
+                if (sunSize > 0l) {
                     transmissionFileInfo.addSize(sunSize);
+                    client.receiveFileUpdate(transmissionFileInfo);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

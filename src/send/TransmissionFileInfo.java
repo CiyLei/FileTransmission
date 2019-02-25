@@ -42,6 +42,5 @@ public class TransmissionFileInfo {
 
     public synchronized void addSize(Long size) {
         currentSize += size;
-        System.out.println("p:" + getProgress() * 100);
     }
 }

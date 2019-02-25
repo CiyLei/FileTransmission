@@ -65,10 +65,10 @@ public abstract class Client {
     public abstract void replyIsAccept(Boolean accept, Integer sendFilePort);
 
     /**
-     * 设置文件发送的进度
+     * 设置接收文件的进度
      * @param transmissionFileInfo
      */
-    public abstract void sendFileUpdate(TransmissionFileInfo transmissionFileInfo);
+    public abstract void receiveFileUpdate(TransmissionFileInfo transmissionFileInfo);
 
     @Override
     public boolean equals(Object obj) {
@@ -89,10 +89,10 @@ public abstract class Client {
         public void onConnection(Boolean connection) {}
 
         /**
-         * 文件发送的进度回调
+         * 接收文件的进度回调
          * @param transmissionFileInfo
          */
-        public void onSendFileUpdate(TransmissionFileInfo transmissionFileInfo) {}
+        public void onReceiveFileUpdate(TransmissionFileInfo transmissionFileInfo) {}
     }
 }
 
