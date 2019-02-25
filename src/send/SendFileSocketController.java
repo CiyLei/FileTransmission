@@ -7,6 +7,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.Socket;
+import java.util.Base64;
 
 public class SendFileSocketController {
     private Configuration config;
@@ -72,10 +73,16 @@ public class SendFileSocketController {
                 connection();
             if (isConnection()) {
                 try {
+                    // 先发送文件的hash,让接收端确认
+                    dataOutputStream.writeUTF(fileInfo.getFileHashValue());
+                    dataOutputStream.flush();
+                    // 再发送文件的名称
+                    dataOutputStream.writeUTF(Base64.getEncoder().encodeToString(fileInfo.getFile().getName().getBytes()));
+                    dataOutputStream.flush();
                     // 先发送文件的开始索引
                     dataOutputStream.writeLong(startIndex);
                     dataOutputStream.flush();
-                    // 读取文件发送数据
+                    // 再取文件发送数据
                     randomAccessFile.seek(startIndex);
                     byte[] buffer = new byte[1024 * 4];
                     while (randomAccessFile.read(buffer) != -1) {

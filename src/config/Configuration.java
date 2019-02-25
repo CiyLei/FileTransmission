@@ -1,11 +1,10 @@
 package config;
 
 import client.Client;
+import client.FileInfo;
 import command.CommandListener;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -145,22 +144,55 @@ public abstract class Configuration {
      * 但有这么一个情况，被识别到的客户端一被扫描到，就马上发送了一个文件，即开了一个commandSocket连到自己
      * 如果这时候这个commandSocket比回复的广播要快，那么Scan的onGet回调就会在是否接收文件的回调之后
      * 所以为了避免这个bug，我们将经过广播回复的客户端保存起来，在commandSocket过快，不在这个保存的客户端里面的时候，拒绝这个commandSocket
+     * 同时也保存着接收文件的hash信息，保证并不是谁传给我我都收
      */
 
-    private Set<Client> clients = new HashSet<>();
+    private Map<Client, List<String>> clients = new HashMap<>();
 
-    public synchronized void addClient(Client client) {
-        if (!clients.contains(client)) {
-            clients.add(client);
+    public synchronized void addClient(Client client, String fileHash) {
+        // 如果client在列表中的话，保存fileInfo列表信息
+        if (fileHash == null && !clients.containsKey(client)) {
+            clients.put(client, new ArrayList<>());
+        }
+        if (fileHash != null) {
+            if (clients.containsKey(client))
+                clients.get(client).add(fileHash);
+            else {
+                List<String> fileInfos = new ArrayList<>();
+                fileInfos.add(fileHash);
+                clients.put(client, fileInfos);
+            }
         }
     }
 
+    /**
+     * 根据ip地址获取client
+     * @param address
+     * @return
+     */
     public synchronized Client getClient(String address){
-        for (Client client : clients) {
+        for (Client client : clients.keySet()) {
             if (client.getHostAddress().equals(address)) {
                 return client;
             }
         }
         return null;
     }
+
+    /**
+     * 验证文件之前是否确认接收过
+     * @param client
+     * @param fileHash
+     * @return
+     */
+    public synchronized Boolean verificationFileHash(Client client, String fileHash) {
+        if (clients.containsKey(client))
+            return clients.get(client).contains(fileHash);
+        return false;
+    }
+
+    /**
+     * 默认文件接收保存路径
+     */
+    public abstract String saveFilePath();
 }

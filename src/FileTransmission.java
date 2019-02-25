@@ -1,3 +1,4 @@
+import client.FileInfo;
 import config.Configuration;
 import config.DefaultConfiguration;
 import scan.BroadcastScan;
@@ -7,6 +8,7 @@ import client.SocketClient;
 import command.AcceptController;
 import command.CommandListener;
 import command.CommandServerSocket;
+import send.SendFileServerSocket;
 
 import java.io.IOException;
 
@@ -15,11 +17,13 @@ public class FileTransmission implements CommandListener {
     private Configuration configuration;
     private Scan broadcastScan;
     private CommandServerSocket commandServerSocket;
+    private SendFileServerSocket sendFileServerSocket;
 
     public FileTransmission() throws IOException {
         this.configuration = new DefaultConfiguration(this);
         this.broadcastScan = new BroadcastScan(this.configuration);
         this.commandServerSocket = new CommandServerSocket(this.configuration);
+        this.sendFileServerSocket = new SendFileServerSocket(this.configuration);
     }
 
     public FileTransmission(CommandListener listener) throws IOException {
@@ -30,6 +34,7 @@ public class FileTransmission implements CommandListener {
         this.configuration = configuration;
         this.broadcastScan = new BroadcastScan(configuration);
         this.commandServerSocket = new CommandServerSocket(configuration);
+        this.sendFileServerSocket = new SendFileServerSocket(this.configuration);
     }
 
     /**

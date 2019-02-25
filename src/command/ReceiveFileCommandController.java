@@ -25,6 +25,8 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
     private Configuration config;
     private DataInputStream commandDataInputStream;
     private DataOutputStream commandDataOutputStream;
+    private String currentFileName;
+    private String currentFileHash;
 
     public ReceiveFileCommandController(Socket socket, Configuration config) {
         this.socket = socket;
@@ -45,6 +47,10 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
 //            e.printStackTrace();
             colse();
         }
+    }
+
+    private Boolean isConnection() {
+        return socket != null && socket.isConnected();
     }
 
     public void colse() {
@@ -87,11 +93,11 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
     private void obtainFileInfo(String[] data) {
         if (data.length == 4) {
             try {
-                String fileName = new String(Base64.getDecoder().decode(data[1]), "utf-8");
+                currentFileName = new String(Base64.getDecoder().decode(data[1]), "utf-8");
                 Long fileSize = Long.parseLong(data[2]);
-                String fileHash = data[3];
+                currentFileHash = data[3];
                 if (config.getListener() != null)
-                    config.getListener().onFileInfoListener(fileName, fileSize, fileHash, this);
+                    config.getListener().onFileInfoListener(currentFileName, fileSize, currentFileHash, this);
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -104,9 +110,16 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
     @Override
     public void accept() {
         try {
-            commandDataOutputStream = new DataOutputStream(socket.getOutputStream());
-            commandDataOutputStream.writeUTF("2,1," + config.sendFilePort().toString());
-            commandDataOutputStream.flush();
+            if (isConnection()) {
+                // 将接受文件的纪录保存下来
+                Client client = config.getClient(socket.getInetAddress().getHostAddress());
+                if (client != null) {
+                    config.addClient(client, currentFileHash);
+                    commandDataOutputStream = new DataOutputStream(socket.getOutputStream());
+                    commandDataOutputStream.writeUTF("2,1," + config.sendFilePort().toString());
+                    commandDataOutputStream.flush();
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

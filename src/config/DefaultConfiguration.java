@@ -221,4 +221,9 @@ public class DefaultConfiguration extends Configuration {
     public Integer sendFileTaskMaxCount() {
         return 5;
     }
+
+    @Override
+    public String saveFilePath() {
+        return "D:\\FileTransmissionCache\\";
+    }
 }
