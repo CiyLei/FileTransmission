@@ -112,11 +112,11 @@ public class SendFileCommandController {
                     if (split.length == 3 && config.getListener() != null) {
                         Boolean accept = split[1].trim().equals("1");
                         Integer sendFilePort = Integer.parseInt(split[2]);
-                        client.replyIsAccept(accept, sendFilePort);
                         if (accept) {
                             // 同意的话就记录下来，再后来传输的时候取
                             config.addSendClient(client, new TransmissionFileInfo(client.getSendFile().getFile().getName(), client.getSendFile().getFile().length(), client.getSendFile().getFileHashValue()));
                         }
+                        client.replyIsAccept(accept, sendFilePort);
                     }
                     break;
             }

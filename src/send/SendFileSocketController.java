@@ -109,7 +109,7 @@ public class SendFileSocketController {
                                     dataOutputStream.write(buffer);
                                     dataOutputStream.flush();
                                     if (sunSize > 0) {
-                                        transmissionFileInfo.addSize(sunSize);
+                                        transmissionFileInfo.addSize(sunSize + buffer.length);
                                         client.sendFileUpdate(transmissionFileInfo);
                                     }
                                 }

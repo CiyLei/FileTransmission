@@ -224,7 +224,7 @@ public class DefaultConfiguration extends Configuration {
 
     @Override
     public String saveFilePath() {
-        return "/Users/chenlei/Desktop/qq img/";
+        return "D:\\FileTransmissionCache\\";
     }
 
     /**
