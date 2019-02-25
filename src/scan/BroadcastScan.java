@@ -43,14 +43,16 @@ public class BroadcastScan implements Scan {
         tasks.clear();
     }
 
-    private void ckeckAllFinish() {
-        for (Boolean isFinish : tasks.values()) {
-            if (!isFinish)
-                return;
+    private synchronized void ckeckAllFinish() {
+        if (tasks.size() > 0) {
+            for (Boolean isFinish : tasks.values()) {
+                if (!isFinish)
+                    return;
+            }
+            tasks.clear();
+            for (Scan.ScanListener listener : listeners)
+                listener.onFinish();
         }
-        tasks.clear();
-        for (Scan.ScanListener listener : listeners)
-            listener.onFinish();
     }
 
     @Override
