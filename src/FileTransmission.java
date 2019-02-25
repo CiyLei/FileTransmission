@@ -1,4 +1,3 @@
-import client.FileInfo;
 import config.Configuration;
 import config.DefaultConfiguration;
 import scan.BroadcastScan;
@@ -9,6 +8,7 @@ import command.AcceptController;
 import command.CommandListener;
 import command.CommandServerSocket;
 import send.SendFileServerSocket;
+import send.TransmissionFileInfo;
 
 import java.io.IOException;
 
@@ -57,10 +57,10 @@ public class FileTransmission implements CommandListener {
     }
 
     @Override
-    public void onFileInfoListener(String fileName, Long fileSize, String fileHash, AcceptController controller) {
-        System.out.println("获取到了文件信息 name：" + fileName + " size:" + fileSize + " hash:" + fileHash);
+    public void onFileInfoListener(TransmissionFileInfo transmissionFIleInfo, AcceptController controller) {
+        System.out.println("获取到了文件信息 name：" + transmissionFIleInfo.getFileName() + " size:" + transmissionFIleInfo.getFileSize() + " hash:" + transmissionFIleInfo.getFileHash());
         controller.accept();
-        System.out.println("我同意接收这个文件 name：" + fileName + " size:" + fileSize + " hash:" + fileHash);
+        System.out.println("我同意接收这个文件 name：" + transmissionFIleInfo.getFileName() + " size:" + transmissionFIleInfo.getFileSize() + " hash:" + transmissionFIleInfo.getFileHash());
     }
 
     @Override

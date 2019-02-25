@@ -2,6 +2,7 @@ package command;
 
 import client.Client;
 import config.Configuration;
+import send.TransmissionFileInfo;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -25,8 +26,7 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
     private Configuration config;
     private DataInputStream commandDataInputStream;
     private DataOutputStream commandDataOutputStream;
-    private String currentFileName;
-    private String currentFileHash;
+    private TransmissionFileInfo currentTransmissionFIleInfo;
 
     public ReceiveFileCommandController(Socket socket, Configuration config) {
         this.socket = socket;
@@ -93,11 +93,12 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
     private void obtainFileInfo(String[] data) {
         if (data.length == 4) {
             try {
-                currentFileName = new String(Base64.getDecoder().decode(data[1]), config.stringEncode());
+                String fileName = new String(Base64.getDecoder().decode(data[1]), config.stringEncode());
                 Long fileSize = Long.parseLong(data[2]);
-                currentFileHash = data[3];
+                String fileHash = data[3];
+                currentTransmissionFIleInfo = new TransmissionFileInfo(fileName, fileSize, fileHash);
                 if (config.getListener() != null)
-                    config.getListener().onFileInfoListener(currentFileName, fileSize, currentFileHash, this);
+                    config.getListener().onFileInfoListener(currentTransmissionFIleInfo, this);
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -114,7 +115,7 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
                 // 将接受文件的纪录保存下来
                 Client client = config.getClient(socket.getInetAddress().getHostAddress());
                 if (client != null) {
-                    config.addClient(client, currentFileHash);
+                    config.addClient(client, currentTransmissionFIleInfo);
                     commandDataOutputStream = new DataOutputStream(socket.getOutputStream());
                     commandDataOutputStream.writeUTF("2,1," + config.sendFilePort().toString());
                     commandDataOutputStream.flush();

@@ -1,8 +1,8 @@
 package config;
 
 import client.Client;
-import client.FileInfo;
 import command.CommandListener;
+import send.TransmissionFileInfo;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -154,22 +154,10 @@ public abstract class Configuration {
      * 同时也保存着接收文件的hash信息，保证并不是谁传给我我都收
      */
 
-    private Map<Client, List<String>> clients = new HashMap<>();
+    private Map<Client, TransmissionFileInfo> clients = new HashMap<>();
 
-    public synchronized void addClient(Client client, String fileHash) {
-        // 如果client在列表中的话，保存fileInfo列表信息
-        if (fileHash == null && !clients.containsKey(client)) {
-            clients.put(client, new ArrayList<>());
-        }
-        if (fileHash != null) {
-            if (clients.containsKey(client))
-                clients.get(client).add(fileHash);
-            else {
-                List<String> fileInfos = new ArrayList<>();
-                fileInfos.add(fileHash);
-                clients.put(client, fileInfos);
-            }
-        }
+    public synchronized void addClient(Client client, TransmissionFileInfo transmissionFIleInfo) {
+        clients.put(client, transmissionFIleInfo);
     }
 
     /**
@@ -189,13 +177,10 @@ public abstract class Configuration {
     /**
      * 验证文件之前是否确认接收过
      * @param client
-     * @param fileHash
      * @return
      */
-    public synchronized Boolean verificationFileHash(Client client, String fileHash) {
-        if (clients.containsKey(client))
-            return clients.get(client).contains(fileHash);
-        return false;
+    public synchronized TransmissionFileInfo getTransmissionFileInfoForClient(Client client) {
+        return clients.get(client);
     }
 
     /**

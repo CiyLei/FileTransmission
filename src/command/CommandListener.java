@@ -1,16 +1,16 @@
 package command;
 
+import send.TransmissionFileInfo;
+
 /**
  * 命令的监听
  */
 public interface CommandListener {
     /**
      * 监听到有客户端要发送文件给我
-     * @param fileName
-     * @param fileSize
-     * @param fileHash
+     * @param transmissionFIleInfo
      */
-    void onFileInfoListener(String fileName, Long fileSize, String fileHash, AcceptController controller);
+    void onFileInfoListener(TransmissionFileInfo transmissionFIleInfo, AcceptController controller);
 
     /**
      * 监听到接收端是否同意接收文件的命令
