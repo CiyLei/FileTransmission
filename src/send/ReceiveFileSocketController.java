@@ -30,11 +30,10 @@ public class ReceiveFileSocketController implements Runnable{
             Client client = config.getClient(socket.getInetAddress().getHostAddress());
             // 根据文件hash值确保文件之前被确认接收过
             if (config.verificationFileHash(client, fileHash)) {
-                String fileName = new String(Base64.getDecoder().decode(dataInputStream.readUTF()), config.stringEncode());
                 Long startIndex = dataInputStream.readLong();
 //                System.out.println(this + " start:" + startIndex);
                 createSaveFilePath(config.saveFilePath());
-                File file = new File(config.saveFilePath() + fileName);
+                File file = new File(config.saveFilePath() + client.getSendFile().getFile().getName());
                 randomAccessFile = new RandomAccessFile(file, "rwd");
                 randomAccessFile.seek(startIndex);
                 byte[] buffer = new byte[1024 * 4];

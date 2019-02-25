@@ -11,6 +11,7 @@ import java.util.List;
  */
 public abstract class Client {
 
+    protected FileInfo sendFile;
     private String hostAddress;
     private String hostName;
     private Integer commandPort;
@@ -41,6 +42,10 @@ public abstract class Client {
 
     public Integer getCommandPort() {
         return commandPort;
+    }
+
+    public FileInfo getSendFile() {
+        return sendFile;
     }
 
     public void addListener(ClientListener listener) {

@@ -76,9 +76,6 @@ public class SendFileSocketController {
                     // 先发送文件的hash,让接收端确认
                     dataOutputStream.writeUTF(fileInfo.getFileHashValue());
                     dataOutputStream.flush();
-                    // 再发送文件的名称
-                    dataOutputStream.writeUTF(Base64.getEncoder().encodeToString(fileInfo.getFile().getName().getBytes()));
-                    dataOutputStream.flush();
                     // 先发送文件的开始索引
                     dataOutputStream.writeLong(startIndex);
                     dataOutputStream.flush();

@@ -12,7 +12,6 @@ import java.io.File;
  */
 public class SocketClient extends Client {
 
-    private FileInfo sendFile;
     // 命令管理socket
     private SendFileCommandController sendFileInfoController;
     private Configuration config;
