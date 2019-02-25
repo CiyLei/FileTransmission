@@ -1,6 +1,7 @@
 package server;
 
 import config.Configuration;
+import send.Client;
 import send.ReceiveFileCommandController;
 
 import java.io.IOException;
@@ -35,8 +36,11 @@ public class CommandServerSocket extends ServerSocket {
                 while (true) {
                     try {
                         Socket socket = accept();
+                        Client client;
                         // 只有进过广播回复的客户端才认证
-                        if (config.clientIsExist(socket.getInetAddress().getHostAddress(), socket.getLocalPort())) {
+                        if ((client = config.getClient(socket.getInetAddress().getHostAddress(), socket.getLocalPort())) != null) {
+                            for (Client.ClientListener listener : client.getListeners())
+                                listener.onConnection(true);
                             config.commandPool().execute(new ReceiveFileCommandController(socket, config));
                         }
                     } catch (IOException e) {

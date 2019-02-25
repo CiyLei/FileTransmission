@@ -27,6 +27,10 @@ public abstract class Client {
 
     public abstract void sendFile(File file);
 
+    public List<ClientListener> getListeners() {
+        return listeners;
+    }
+
     public String getHostAddress() {
         return hostAddress;
     }

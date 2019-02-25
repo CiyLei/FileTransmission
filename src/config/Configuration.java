@@ -155,11 +155,12 @@ public abstract class Configuration {
         }
     }
 
-    public synchronized Boolean clientIsExist(String address, Integer port){
+    public synchronized Client getClient(String address, Integer port){
         for (Client client : clients) {
-            if (client.getHostAddress().equals(address) && client.getCommandPort().equals(port))
-                return true;
+            if (client.getHostAddress().equals(address) && client.getCommandPort().equals(port)) {
+                return client;
+            }
         }
-        return false;
+        return null;
     }
 }
