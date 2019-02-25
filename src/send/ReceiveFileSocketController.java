@@ -32,12 +32,14 @@ public class ReceiveFileSocketController implements Runnable{
             if (config.verificationFileHash(client, fileHash)) {
                 String fileName = new String(Base64.getDecoder().decode(dataInputStream.readUTF()), config.stringEncode());
                 Long startIndex = dataInputStream.readLong();
+//                System.out.println(this + " start:" + startIndex);
                 File file = new File(config.saveFilePath() + fileName);
                 randomAccessFile = new RandomAccessFile(file, "rwd");
                 randomAccessFile.seek(startIndex);
                 byte[] buffer = new byte[1024 * 4];
-                while(dataInputStream.read(buffer) != -1){
-                    randomAccessFile.write(buffer, 0, buffer.length);
+                int len = -1;
+                while((len = socket.getInputStream().read(buffer)) != -1){
+                    randomAccessFile.write(buffer, 0, len);
                 }
             }
         } catch (IOException e) {
