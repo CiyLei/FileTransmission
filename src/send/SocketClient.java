@@ -13,6 +13,7 @@ public class SocketClient extends Client {
     private FileInfo sendFile;
     // 命令管理socket
     private SendFileCommandController sendFileInfoController;
+    private Configuration config;
 
     /**
      * Socket对象
@@ -23,7 +24,8 @@ public class SocketClient extends Client {
      */
     public SocketClient(String hostAddress, String hostName, Integer commandPort, Configuration configuration) {
         super(hostAddress, hostName, commandPort, configuration);
-        sendFileInfoController = new SendFileCommandController(hostAddress, commandPort, configuration, listeners);
+        this.config = configuration;
+        sendFileInfoController = new SendFileCommandController(hostAddress, commandPort, configuration, this);
     }
 
     @Override
@@ -68,5 +70,10 @@ public class SocketClient extends Client {
     @Override
     public void connection() {
         sendFileInfoController.connection();
+    }
+
+    @Override
+    public void replyIsAccept(Boolean accept) {
+        config.getListener().onAcceptListener(accept);
     }
 }

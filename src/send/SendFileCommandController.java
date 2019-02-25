@@ -26,13 +26,13 @@ public class SendFileCommandController {
     private String serverIp;
     private Integer commandPort;
     private Configuration config;
-    private List<Client.ClientListener> listeners;
+    private Client client;
 
-    public SendFileCommandController(String serverIp, Integer commandPort, Configuration config, List<Client.ClientListener> listeners) {
+    public SendFileCommandController(String serverIp, Integer commandPort, Configuration config, Client client) {
         this.serverIp = serverIp;
         this.commandPort = commandPort;
         this.config = config;
-        this.listeners = listeners;
+        this.client = client;
 //        connection();
     }
 
@@ -44,11 +44,11 @@ public class SendFileCommandController {
                 commandDataOutputStream = new DataOutputStream(commandSocket.getOutputStream());
             if (commandDatainputStream == null)
             commandDatainputStream = new DataInputStream(commandSocket.getInputStream());
-            for (Client.ClientListener listener : listeners)
+            for (Client.ClientListener listener : client.getListeners())
                 listener.onConnection(true);
         } catch (IOException e) {
             e.printStackTrace();
-            for (Client.ClientListener listener : listeners)
+            for (Client.ClientListener listener : client.getListeners())
                 listener.onConnection(false);
         }
     }
@@ -85,7 +85,7 @@ public class SendFileCommandController {
                 commandDataOutputStream = null;
                 commandDatainputStream = null;
                 commandSocket = null;
-                for (Client.ClientListener listener : listeners)
+                for (Client.ClientListener listener : client.getListeners())
                     listener.onConnection(false);
             }
         }
@@ -100,8 +100,10 @@ public class SendFileCommandController {
         if (split.length > 0) {
             switch (Integer.parseInt(split[0])) {
                 case 2:
-                    if (split.length == 2 && config.getListener() != null)
-                        config.getListener().onAcceptListener(split[1].trim().equals("1"));
+                    if (split.length == 2 && config.getListener() != null) {
+                        Boolean accept = split[1].trim().equals("1");
+                        client.replyIsAccept(accept);
+                    }
                     break;
             }
         }

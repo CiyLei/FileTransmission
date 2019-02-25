@@ -51,6 +51,13 @@ public abstract class Client {
 
     public abstract void connection();
 
+    /**
+     * 回复是否同意接收文件
+     * @param accept
+     * @return
+     */
+    public abstract void replyIsAccept(Boolean accept);
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Client) {
