@@ -93,7 +93,7 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
     private void obtainFileInfo(String[] data) {
         if (data.length == 4) {
             try {
-                currentFileName = new String(Base64.getDecoder().decode(data[1]), "utf-8");
+                currentFileName = new String(Base64.getDecoder().decode(data[1]), config.stringEncode());
                 Long fileSize = Long.parseLong(data[2]);
                 currentFileHash = data[3];
                 if (config.getListener() != null)

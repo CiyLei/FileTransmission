@@ -27,6 +27,13 @@ public abstract class Configuration {
     }
 
     /**
+     * 默认编码
+     */
+    public String stringEncode() {
+        return "utf-8";
+    }
+
+    /**
      * 获取自己名称
      * @return
      */
