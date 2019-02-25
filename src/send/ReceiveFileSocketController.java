@@ -39,9 +39,21 @@ public class ReceiveFileSocketController implements Runnable{
                 randomAccessFile.seek(startIndex);
                 byte[] buffer = new byte[1024 * 4];
                 int len = -1;
+                // 保持一段时间再更新一下
+                Long ct = System.currentTimeMillis();
+                Long sunSize = 0l;
                 while((len = socket.getInputStream().read(buffer)) != -1){
                     randomAccessFile.write(buffer, 0, len);
+                    sunSize += len;
+                    if (System.currentTimeMillis() - ct >= config.sendFileUpdateFrequency()) {
+                        transmissionFileInfo.addSize(sunSize);
+                        client.sendFileUpdate(transmissionFileInfo);
+                        ct = System.currentTimeMillis();
+                        sunSize = 0l;
+                    }
                 }
+                if (sunSize > 0l)
+                    transmissionFileInfo.addSize(sunSize);
             }
         } catch (IOException e) {
             e.printStackTrace();

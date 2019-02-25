@@ -1,5 +1,6 @@
 import scan.Scan;
 import client.Client;
+import send.TransmissionFileInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +20,11 @@ public class Main {
                         @Override
                         public void onConnection(Boolean connection) {
                             System.out.println("command连接" + (connection ? "成功" : "失败") + " " + client.getHostName() + " ip:" + client.getHostAddress() + " commandPort:" + client.getCommandPort());
+                        }
+
+                        @Override
+                        public void onSendFileUpdate(TransmissionFileInfo transmissionFileInfo) {
+                            System.out.println("文件:" + transmissionFileInfo.getFileName() + " 进度:" + transmissionFileInfo.getProgress());
                         }
                     });
 //                    try {

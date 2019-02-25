@@ -1,6 +1,7 @@
 package client;
 
 import config.Configuration;
+import send.TransmissionFileInfo;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -63,6 +64,12 @@ public abstract class Client {
      */
     public abstract void replyIsAccept(Boolean accept, Integer sendFilePort);
 
+    /**
+     * 设置文件发送的进度
+     * @param transmissionFileInfo
+     */
+    public abstract void sendFileUpdate(TransmissionFileInfo transmissionFileInfo);
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Client) {
@@ -80,6 +87,12 @@ public abstract class Client {
          * @param connection
          */
         public void onConnection(Boolean connection) {}
+
+        /**
+         * 文件发送的进度回调
+         * @param transmissionFileInfo
+         */
+        public void onSendFileUpdate(TransmissionFileInfo transmissionFileInfo) {}
     }
 }
 

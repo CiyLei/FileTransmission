@@ -3,6 +3,7 @@ package client;
 import command.SendFileCommandController;
 import config.Configuration;
 import send.SendFileSocketController;
+import send.TransmissionFileInfo;
 import utils.MD5Util;
 
 import java.io.File;
@@ -82,6 +83,12 @@ public class SocketClient extends Client {
         if (accept) {
             startSendFile(sendFilePort);
         }
+    }
+
+    @Override
+    public void sendFileUpdate(TransmissionFileInfo transmissionFileInfo) {
+        for (Client.ClientListener listener : listeners)
+            listener.onSendFileUpdate(transmissionFileInfo);
     }
 
     /**

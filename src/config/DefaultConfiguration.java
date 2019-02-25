@@ -226,4 +226,13 @@ public class DefaultConfiguration extends Configuration {
     public String saveFilePath() {
         return "/Users/chenlei/Desktop/qq img/";
     }
+
+    /**
+     * 发送文件的时候，回调更新的频率
+     * @return
+     */
+    @Override
+    public Integer sendFileUpdateFrequency() {
+        return 500;
+    }
 }

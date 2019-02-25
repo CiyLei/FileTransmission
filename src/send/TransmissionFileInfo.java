@@ -7,21 +7,17 @@ public class TransmissionFileInfo {
     private String fileName;
     private Long fileSize;
     private String fileHash;
-    private double progress;
+    private volatile Long currentSize;
 
-    public TransmissionFileInfo(String fileName, Long fileSize, String fileHash, double progress) {
+    public TransmissionFileInfo(String fileName, Long fileSize, String fileHash, Long currentSize) {
         this.fileName = fileName;
         this.fileSize = fileSize;
         this.fileHash = fileHash;
-        this.progress = progress;
+        this.currentSize = currentSize;
     }
 
     public TransmissionFileInfo(String fileName, Long fileSize, String fileHash) {
-        this(fileName, fileSize, fileHash, 0.0);
-    }
-
-    public void setProgress(double progress) {
-        this.progress = progress;
+        this(fileName, fileSize, fileHash, 0l);
     }
 
     public String getFileName() {
@@ -37,6 +33,15 @@ public class TransmissionFileInfo {
     }
 
     public double getProgress() {
-        return progress;
+        return currentSize.doubleValue() / fileSize.doubleValue();
+    }
+
+    public Long getCurrentSize() {
+        return currentSize;
+    }
+
+    public synchronized void addSize(Long size) {
+        currentSize += size;
+        System.out.println("p:" + getProgress() * 100);
     }
 }

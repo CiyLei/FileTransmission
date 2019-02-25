@@ -187,4 +187,10 @@ public abstract class Configuration {
      * 默认文件接收保存路径
      */
     public abstract String saveFilePath();
+
+    /**
+     * 发送文件的时候，回调更新的频率
+     * @return
+     */
+    public abstract Integer sendFileUpdateFrequency();
 }
