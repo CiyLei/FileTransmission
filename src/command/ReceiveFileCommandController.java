@@ -48,7 +48,7 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
     }
 
     public void colse() {
-        Client client = config.getClient(socket.getInetAddress().getHostAddress(), socket.getLocalPort());
+        Client client = config.getClient(socket.getInetAddress().getHostAddress());
         if (client != null) {
             for (Client.ClientListener listener : client.getListeners())
                 listener.onConnection(false);

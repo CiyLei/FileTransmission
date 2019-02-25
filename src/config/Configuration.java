@@ -155,9 +155,9 @@ public abstract class Configuration {
         }
     }
 
-    public synchronized Client getClient(String address, Integer port){
+    public synchronized Client getClient(String address){
         for (Client client : clients) {
-            if (client.getHostAddress().equals(address) && client.getCommandPort().equals(port)) {
+            if (client.getHostAddress().equals(address)) {
                 return client;
             }
         }

@@ -44,7 +44,7 @@ public class SendFileCommandController {
             if (commandDataOutputStream == null)
                 commandDataOutputStream = new DataOutputStream(commandSocket.getOutputStream());
             if (commandDatainputStream == null)
-            commandDatainputStream = new DataInputStream(commandSocket.getInputStream());
+                commandDatainputStream = new DataInputStream(commandSocket.getInputStream());
             for (Client.ClientListener listener : client.getListeners())
                 listener.onConnection(true);
         } catch (IOException e) {
