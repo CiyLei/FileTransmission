@@ -47,6 +47,14 @@ public abstract class Client {
 
     public abstract void connection();
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Client) {
+            return hostAddress.equals(((Client) obj).hostAddress) && commandPort.equals(((Client) obj).commandPort);
+        }
+        return super.equals(obj);
+    }
+
     /**
      * 传输中的回调
      */

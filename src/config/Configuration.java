@@ -1,7 +1,10 @@
 package config;
 
+import send.Client;
 import server.CommandListener;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -137,4 +140,26 @@ public abstract class Configuration {
         return commandPoolInstance;
     }
 
+    /**
+     * 一般情况下是接收到广播的回复信息则认为识别到一个客户端。
+     * 但有这么一个情况，被识别到的客户端一被扫描到，就马上发送了一个文件，即开了一个commandSocket连到自己
+     * 如果这时候这个commandSocket比回复的广播要快，那么Scan的onGet回调就会在是否接收文件的回调之后
+     * 所以为了避免这个bug，我们将经过广播回复的客户端保存起来，在commandSocket过快，不在这个保存的客户端里面的时候，拒绝这个commandSocket
+     */
+
+    private Set<Client> clients = new HashSet<>();
+
+    public synchronized void addClient(Client client) {
+        if (!clients.contains(client)) {
+            clients.add(client);
+        }
+    }
+
+    public synchronized Boolean clientIsExist(String address, Integer port){
+        for (Client client : clients) {
+            if (client.getHostAddress().equals(address) && client.getCommandPort().equals(port))
+                return true;
+        }
+        return false;
+    }
 }

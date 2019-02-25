@@ -149,7 +149,9 @@ public class BroadcastScan implements Scan {
                             Integer port = Integer.parseInt(split[2]);
                             for (Scan.ScanListener listener : listeners) {
 //                              System.out.println(respone);
-                                listener.onGet(new SocketClient(datagramPacket.getAddress().getHostAddress(), hostName, port, config));
+                                SocketClient client = new SocketClient(datagramPacket.getAddress().getHostAddress(), hostName, port, config);
+                                listener.onGet(client);
+                                config.addClient(client);
                             }
                             // 如果是接受到广播的话，就进行回复,否则的话就是回复广播，不理他
                             if (respone.startsWith(config.broadcastSendTag())) {

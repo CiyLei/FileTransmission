@@ -35,7 +35,10 @@ public class CommandServerSocket extends ServerSocket {
                 while (true) {
                     try {
                         Socket socket = accept();
-                        config.commandPool().execute(new ReceiveFileCommandController(socket, config));
+                        // 只有进过广播回复的客户端才认证
+                        if (config.clientIsExist(socket.getInetAddress().getHostAddress(), socket.getLocalPort())) {
+                            config.commandPool().execute(new ReceiveFileCommandController(socket, config));
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
