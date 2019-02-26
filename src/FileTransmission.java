@@ -11,6 +11,7 @@ import send.SendFileServerSocket;
 import send.TransmissionFileInfo;
 
 import java.io.IOException;
+import java.util.List;
 
 public class FileTransmission implements CommandListener {
 
@@ -71,6 +72,11 @@ public class FileTransmission implements CommandListener {
     @Override
     public void onStartOrPauseListener(Boolean isStart) {
         System.out.println("接收端点了" + (isStart ? "开始" : "暂停"));
+    }
+
+    @Override
+    public void onCliensNumChange(List<Client> clients) {
+
     }
 
 }

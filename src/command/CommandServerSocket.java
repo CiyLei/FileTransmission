@@ -1,5 +1,6 @@
 package command;
 
+import client.SocketClient;
 import config.Configuration;
 import client.Client;
 
@@ -35,8 +36,11 @@ public class CommandServerSocket extends ServerSocket {
                 while (true) {
                     try {
                         Socket socket = accept();
-                        Client client;
-                        // 只有进过广播回复的客户端才认证
+                        Client client = config.getClient(socket.getInetAddress().getHostAddress());
+                        if (client == null) {
+                            client = new SocketClient(socket.getInetAddress().getHostAddress(), socket.getInetAddress().getHostName(), socket.getPort(), config);
+                            config.addClient(client);
+                        }
                         if ((client = config.getClient(socket.getInetAddress().getHostAddress())) != null) {
                             for (Client.ClientListener listener : client.getListeners())
                                 listener.onConnection(true);

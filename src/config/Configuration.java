@@ -168,10 +168,13 @@ public abstract class Configuration {
      * 所以为了避免这个bug，我们将经过广播回复的客户端保存起来，在commandSocket过快，不在这个保存的客户端里面的时候，拒绝这个commandSocket
      * 同时也保存着接收文件的hash信息，保证并不是谁传给我我都收
      */
-    private Set<Client> clients = new HashSet<>();
+    private List<Client> clients = new Vector<>();
 
     public synchronized void addClient(Client client) {
-        clients.add(client);
+        if (!clients.contains(client)) {
+            clients.add(client);
+            listener.onCliensNumChange(clients);
+        }
     }
 
     /**

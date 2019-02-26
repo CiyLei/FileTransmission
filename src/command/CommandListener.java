@@ -1,6 +1,9 @@
 package command;
 
+import client.Client;
 import send.TransmissionFileInfo;
+
+import java.util.List;
 
 /**
  * 命令的监听
@@ -22,5 +25,11 @@ public interface CommandListener {
      * @param isStart
      */
     void onStartOrPauseListener(Boolean isStart);
+
+    /**
+     * 监听到客户端数量变化
+     * @param clients
+     */
+    void onCliensNumChange(List<Client> clients);
 }
 
