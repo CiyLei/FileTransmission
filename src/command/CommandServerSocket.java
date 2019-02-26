@@ -54,6 +54,7 @@ public class CommandServerSocket extends ServerSocket {
                         if ((client = config.getClient(socket.getInetAddress().getHostAddress())) != null) {
                             for (Client.ClientListener listener : client.getListeners())
                                 listener.onConnection(true);
+                            // 当commandSocket连接上了socket，则针对这个socket开启两个线程，一个死循环读消息专门回复消息，一个主动发送消息
                             config.commandPool().execute(new ReceiveFileCommandController(socket, config));
                         }
                     } catch (IOException e) {
