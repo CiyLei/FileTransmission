@@ -57,7 +57,28 @@ public class ReceiveFileSocketController implements Runnable{
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            colse();
+        }
+    }
+
+    private void colse() {
+        try {
+            if (randomAccessFile != null)
+                randomAccessFile.close();
+            if (dataInputStream != null)
+                dataInputStream.close();
+            socket.close();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        randomAccessFile = null;
+        dataInputStream = null;
+        socket = null;
+        Client client = config.getClient(socket.getInetAddress().getHostAddress());
+        if (client != null) {
+            for (Client.ClientListener listener : client.getListeners())
+                listener.onConnection(false);
         }
     }
 

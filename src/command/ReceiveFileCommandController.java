@@ -60,8 +60,10 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
                 listener.onConnection(false);
         }
         try {
-            commandDataInputStream.close();
-            commandDataOutputStream.close();
+            if (commandDataInputStream != null)
+                commandDataInputStream.close();
+            if (commandDataOutputStream != null)
+                commandDataOutputStream.close();
             socket.close();
         } catch (IOException e1) {
             e1.printStackTrace();
@@ -69,6 +71,8 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
         commandDataOutputStream = null;
         commandDataInputStream = null;
         socket = null;
+        for (Client.ClientListener listener : client.getListeners())
+            listener.onConnection(false);
     }
 
     /**

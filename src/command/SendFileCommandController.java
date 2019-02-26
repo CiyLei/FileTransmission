@@ -86,8 +86,10 @@ public class SendFileCommandController {
 
     public void colse() {
         try {
-            commandDataOutputStream.close();
-            commandDatainputStream.close();
+            if (commandDataOutputStream != null)
+                commandDataOutputStream.close();
+            if (commandDatainputStream != null)
+                commandDatainputStream.close();
             commandSocket.close();
         } catch (IOException e1) {
             e1.printStackTrace();

@@ -16,6 +16,7 @@ public abstract class Client {
     private String hostAddress;
     private String hostName;
     private Integer commandPort;
+    private Boolean isConnection = false;
     Configuration configuration;
     List<ClientListener> listeners;
     // 接收文件的信息
@@ -29,6 +30,12 @@ public abstract class Client {
         this.commandPort = commandPort;
         this.configuration = configuration;
         listeners = new ArrayList<>();
+        addListener(new ClientListener() {
+            @Override
+            public void onConnection(Boolean connection) {
+                isConnection = connection;
+            }
+        });
     }
 
     public abstract void sendFile(File file);
@@ -65,7 +72,9 @@ public abstract class Client {
         this.listeners.add(listener);
     }
 
-    public abstract Boolean isConnection();
+    public Boolean isConnection() {
+        return isConnection;
+    }
 
     public abstract void connection();
 

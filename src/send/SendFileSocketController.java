@@ -8,7 +8,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.Socket;
-import java.util.Base64;
 
 public class SendFileSocketController {
     private Configuration config;
@@ -139,6 +138,11 @@ public class SendFileSocketController {
             randomAccessFile = null;
             dataOutputStream = null;
             socket = null;
+            Client client = config.getClient(socket.getInetAddress().getHostAddress());
+            if (client != null) {
+                for (Client.ClientListener listener : client.getListeners())
+                    listener.onConnection(false);
+            }
         }
     }
 }

@@ -47,7 +47,7 @@ public class Main {
                     System.out.println("扫描完毕");
                 }
             });
-//            scan.startScan();
+            scan.startScan();
         } catch (IOException e) {
             e.printStackTrace();
         }
