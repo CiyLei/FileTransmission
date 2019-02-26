@@ -23,18 +23,18 @@ public class Main {
                         }
 
                         @Override
-                        public void onReceiveFileUpdate(TransmissionFileInfo transmissionFileInfo) {
-                            System.out.println("接收文件:" + transmissionFileInfo.getFileName() + " 进度:" + transmissionFileInfo.getProgress());
+                        public void onReceiveFileUpdate() {
+                            System.out.println("接收文件:" + client.getReceiveTransmissionFileInfo().getFileName() + " 进度:" + client.getReceiveTransmissionFileInfo().getProgress());
                         }
 
                         @Override
-                        public void onSendFileUpdate(TransmissionFileInfo transmissionFileInfo) {
-                            System.out.println("发送文件:" + transmissionFileInfo.getFileName() + " 进度:" + transmissionFileInfo.getProgress());
+                        public void onSendFileUpdate() {
+                            System.out.println("发送文件:" + client.getSendTransmissionFileInfo().getFileName() + " 进度:" + client.getSendTransmissionFileInfo().getProgress());
                         }
                     });
                     try {
                         Thread.sleep(1000);
-                        File file = new File("C:\\Users\\90373\\Desktop\\QQ_V6.5.2.dmg");
+                        File file = new File("C:\\Users\\LENOVO\\Desktop\\QQ_V6.5.2.dmg");
                         System.out.println("开始发送文件信息 name：" + file.getName() + " size:" + file.length());
                         client.sendFile(file);
                     } catch (InterruptedException e) {
@@ -47,7 +47,7 @@ public class Main {
                     System.out.println("扫描完毕");
                 }
             });
-            scan.startScan();
+//            scan.startScan();
         } catch (IOException e) {
             e.printStackTrace();
         }

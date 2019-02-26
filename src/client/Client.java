@@ -18,6 +18,10 @@ public abstract class Client {
     private Integer commandPort;
     Configuration configuration;
     List<ClientListener> listeners;
+    // 接收文件的信息
+    protected TransmissionFileInfo receiveTransmissionFileInfo;
+    // 发送文件的信息
+    protected TransmissionFileInfo sendTransmissionFileInfo;
 
     public Client(String hostAddress, String hostName, Integer commandPort, Configuration configuration) {
         this.hostAddress = hostAddress;
@@ -28,6 +32,14 @@ public abstract class Client {
     }
 
     public abstract void sendFile(File file);
+
+    public TransmissionFileInfo getReceiveTransmissionFileInfo() {
+        return receiveTransmissionFileInfo;
+    }
+
+    public TransmissionFileInfo getSendTransmissionFileInfo() {
+        return sendTransmissionFileInfo;
+    }
 
     public List<ClientListener> getListeners() {
         return listeners;
@@ -96,15 +108,13 @@ public abstract class Client {
 
         /**
          * 接收文件的进度回调
-         * @param transmissionFileInfo
          */
-        public void onReceiveFileUpdate(TransmissionFileInfo transmissionFileInfo) {}
+        public void onReceiveFileUpdate() {}
 
         /**
          * 发送文件的进度回调
-         * @param transmissionFileInfo
          */
-        public void onSendFileUpdate(TransmissionFileInfo transmissionFileInfo) {}
+        public void onSendFileUpdate() {}
 
 
     }

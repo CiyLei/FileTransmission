@@ -87,14 +87,16 @@ public class SocketClient extends Client {
 
     @Override
     public void receiveFileUpdate(TransmissionFileInfo transmissionFileInfo) {
+        receiveTransmissionFileInfo = transmissionFileInfo;
         for (Client.ClientListener listener : listeners)
-            listener.onReceiveFileUpdate(transmissionFileInfo);
+            listener.onReceiveFileUpdate();
     }
 
     @Override
     public void sendFileUpdate(TransmissionFileInfo transmissionFileInfo) {
+        sendTransmissionFileInfo = transmissionFileInfo;
         for (Client.ClientListener listener : listeners)
-            listener.onSendFileUpdate(transmissionFileInfo);
+            listener.onSendFileUpdate();
     }
 
     /**
