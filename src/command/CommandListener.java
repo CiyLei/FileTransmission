@@ -30,6 +30,6 @@ public interface CommandListener {
      * 监听到客户端数量变化
      * @param clients
      */
-    void onCliensNumChange(List<Client> clients);
+    void onCliensCountChange(List<Client> clients);
 }
 

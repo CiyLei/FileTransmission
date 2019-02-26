@@ -75,8 +75,8 @@ public class FileTransmission implements CommandListener {
     }
 
     @Override
-    public void onCliensNumChange(List<Client> clients) {
-
+    public void onCliensCountChange(List<Client> clients) {
+        System.out.println("当前客户:" + clients);
     }
 
 }
