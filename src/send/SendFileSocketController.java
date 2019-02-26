@@ -89,10 +89,10 @@ public class SendFileSocketController {
                         Long ct = System.currentTimeMillis();
                         Long sunSize = 0l;
                         while (true) {
-                            if (randomAccessFile.getFilePointer() + buffer.length - 1 <= endIndex) {
+                            if (randomAccessFile.getFilePointer() + buffer.length - 1 < endIndex) {
                                 if (randomAccessFile.read(buffer) != -1) {
                                     dataOutputStream.write(buffer);
-                                    dataOutputStream.flush();
+//                                    dataOutputStream.flush();
 
                                     sunSize += buffer.length;
                                     if (System.currentTimeMillis() - ct >= config.sendFileUpdateFrequency()) {
