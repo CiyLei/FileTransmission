@@ -51,10 +51,8 @@ public class ReceiveFileSocketController implements Runnable{
                         sunSize = 0l;
                     }
                 }
-                if (sunSize > 0l) {
-                    transmissionFileInfo.addSize(sunSize);
-                    client.receiveFileUpdate(transmissionFileInfo);
-                }
+                transmissionFileInfo.addSize(sunSize);
+                client.receiveFileUpdate(transmissionFileInfo);
             }
         } catch (IOException e) {
 //            e.printStackTrace();

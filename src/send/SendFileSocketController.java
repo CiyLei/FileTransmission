@@ -107,10 +107,8 @@ public class SendFileSocketController {
                                 if (randomAccessFile.read(buffer) != -1) {
                                     dataOutputStream.write(buffer);
                                     dataOutputStream.flush();
-                                    if (sunSize > 0) {
-                                        transmissionFileInfo.addSize(sunSize + buffer.length);
-                                        client.sendFileUpdate(transmissionFileInfo);
-                                    }
+                                    transmissionFileInfo.addSize(sunSize + buffer.length);
+                                    client.sendFileUpdate(transmissionFileInfo);
                                 }
                                 break;
                             }
