@@ -36,6 +36,18 @@ public class SendFileCommandController {
         this.config = config;
         this.client = client;
 //        connection();
+        config.commandPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    // 监听这个socket断不断
+                    if (commandSocket != null && commandSocket.isClosed()) {
+                        colse();
+                        return;
+                    }
+                }
+            }
+        });
     }
 
     public void connection() {
