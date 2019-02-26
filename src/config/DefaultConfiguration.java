@@ -2,11 +2,9 @@ package config;
 
 import command.CommandListener;
 
+import java.io.UnsupportedEncodingException;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * 默认的配置信息
@@ -15,6 +13,20 @@ public class DefaultConfiguration extends Configuration {
 
     public DefaultConfiguration(CommandListener listener) {
         super(listener);
+    }
+
+    /**
+     * 传输过程中会对文件名称进行编码在传输，防止出现奇怪的问题，这里进行编码（默认Base64）
+     * @return
+     */
+    @Override
+    public String encodeString(String str) {
+        return Base64.getEncoder().encodeToString(str.getBytes());
+    }
+
+    @Override
+    public String decodeString(String str) throws UnsupportedEncodingException {
+        return new String(Base64.getDecoder().decode(str), stringEncode());
     }
 
     /**

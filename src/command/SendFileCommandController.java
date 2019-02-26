@@ -68,7 +68,7 @@ public class SendFileCommandController {
                 String fileName = file.getFile().getName();
                 String fileSize = String.valueOf(file.getFile().length());
                 String fileHash = file.getFileHashValue();
-                String data = "1," + Base64.getEncoder().encodeToString(fileName.getBytes(config.stringEncode())) + "," + fileSize + "," + fileHash;
+                String data = "1," + config.encodeString(fileName) + "," + fileSize + "," + fileHash;
                 commandDataOutputStream.writeUTF(data);
                 commandDataOutputStream.flush();
                 // 收到回复信息

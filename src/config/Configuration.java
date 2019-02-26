@@ -4,6 +4,7 @@ import client.Client;
 import command.CommandListener;
 import send.TransmissionFileInfo;
 
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -32,6 +33,14 @@ public abstract class Configuration {
     public String stringEncode() {
         return "utf-8";
     }
+
+    /**
+     * 传输过程中会对文件名称进行编码在传输，防止出现奇怪的问题，这里进行编码（默认Base64）
+     * @return
+     */
+    public abstract String encodeString(String str);
+
+    public abstract String decodeString(String str) throws UnsupportedEncodingException;
 
     /**
      * 获取自己名称
