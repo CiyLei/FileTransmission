@@ -64,7 +64,8 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
                 commandDataInputStream.close();
             if (commandDataOutputStream != null)
                 commandDataOutputStream.close();
-            socket.close();
+            if (socket != null)
+                socket.close();
         } catch (IOException e1) {
             e1.printStackTrace();
         }

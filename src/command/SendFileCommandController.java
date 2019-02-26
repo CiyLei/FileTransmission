@@ -102,7 +102,8 @@ public class SendFileCommandController {
                 commandDataOutputStream.close();
             if (commandDatainputStream != null)
                 commandDatainputStream.close();
-            commandSocket.close();
+            if (commandSocket != null)
+                commandSocket.close();
         } catch (IOException e1) {
             e1.printStackTrace();
         }

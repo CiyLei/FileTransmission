@@ -68,7 +68,8 @@ public class ReceiveFileSocketController implements Runnable{
                 randomAccessFile.close();
             if (dataInputStream != null)
                 dataInputStream.close();
-            socket.close();
+            if (socket != null)
+                socket.close();
         } catch (IOException e1) {
             e1.printStackTrace();
         }
