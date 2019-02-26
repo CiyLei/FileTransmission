@@ -71,8 +71,6 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
         commandDataOutputStream = null;
         commandDataInputStream = null;
         socket = null;
-        for (Client.ClientListener listener : client.getListeners())
-            listener.onConnection(false);
     }
 
     /**
