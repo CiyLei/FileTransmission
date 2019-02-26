@@ -44,20 +44,29 @@ public class BroadcastScan implements Scan {
     }
 
     private synchronized void ckeckAllFinish() {
-        if (tasks.size() > 0) {
-            for (Boolean isFinish : tasks.values()) {
-                if (!isFinish)
-                    return;
+        try {
+            if (tasks.size() > 0) {
+                for (Boolean isFinish : tasks.values()) {
+                    if (!isFinish)
+                        return;
+                }
             }
-            tasks.clear();
-            for (Scan.ScanListener listener : listeners)
-                listener.onFinish();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        tasks.clear();
+        for (Scan.ScanListener listener : listeners)
+            listener.onFinish();
     }
 
     @Override
     public void addListener(ScanListener listener) {
         listeners.add(listener);
+    }
+
+    @Override
+    public List<ScanListener> getListener() {
+        return listeners;
     }
 
     /**
@@ -151,8 +160,8 @@ public class BroadcastScan implements Scan {
                             for (Scan.ScanListener listener : listeners) {
 //                              System.out.println(respone);
                                 listener.onGet(client);
-                                config.addClient(client);
                             }
+                            config.addClient(client);
                             // 如果是接受到广播的话，就进行回复,否则的话就是回复广播，不理他
                             if (respone.startsWith(config.broadcastSendTag())) {
                                 reply(datagramPacket.getAddress().getHostAddress());

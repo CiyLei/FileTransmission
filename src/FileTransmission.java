@@ -23,7 +23,7 @@ public class FileTransmission implements CommandListener {
     public FileTransmission() throws IOException {
         this.configuration = new DefaultConfiguration(this);
         this.broadcastScan = new BroadcastScan(this.configuration);
-        this.commandServerSocket = new CommandServerSocket(this.configuration);
+        this.commandServerSocket = new CommandServerSocket(this.configuration, broadcastScan.getListener());
         this.sendFileServerSocket = new SendFileServerSocket(this.configuration);
     }
 
@@ -34,7 +34,7 @@ public class FileTransmission implements CommandListener {
     public FileTransmission(Configuration configuration) throws IOException {
         this.configuration = configuration;
         this.broadcastScan = new BroadcastScan(configuration);
-        this.commandServerSocket = new CommandServerSocket(configuration);
+        this.commandServerSocket = new CommandServerSocket(configuration, broadcastScan.getListener());
         this.sendFileServerSocket = new SendFileServerSocket(this.configuration);
     }
 

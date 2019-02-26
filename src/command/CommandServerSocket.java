@@ -3,10 +3,12 @@ package command;
 import client.SocketClient;
 import config.Configuration;
 import client.Client;
+import scan.Scan;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 
 /**
  * 监听接受接收文件的socket
@@ -22,10 +24,12 @@ import java.net.Socket;
 public class CommandServerSocket extends ServerSocket {
 
     private Configuration config;
+    private List<Scan.ScanListener> listeners;
 
-    public CommandServerSocket(Configuration config) throws IOException {
+    public CommandServerSocket(Configuration config, List<Scan.ScanListener> listeners) throws IOException {
         super(config.commandPort());
         this.config = config;
+        this.listeners = listeners;
         start();
     }
 
@@ -37,8 +41,14 @@ public class CommandServerSocket extends ServerSocket {
                     try {
                         Socket socket = accept();
                         Client client = config.getClient(socket.getInetAddress().getHostAddress());
+                        // 客户不经过广播的情况下，手动进入广播的回调
                         if (client == null) {
-                            client = new SocketClient(socket.getInetAddress().getHostAddress(), socket.getInetAddress().getHostName(), socket.getPort(), config);
+                            client = new SocketClient(socket.getInetAddress().getHostAddress(), socket.getInetAddress().getHostName(), socket.getLocalPort(), config);
+                            if (listeners != null) {
+                                for (Scan.ScanListener listener : listeners) {
+                                    listener.onGet(client);
+                                }
+                            }
                             config.addClient(client);
                         }
                         if ((client = config.getClient(socket.getInetAddress().getHostAddress())) != null) {

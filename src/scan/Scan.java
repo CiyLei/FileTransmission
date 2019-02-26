@@ -3,6 +3,7 @@ package scan;
 import client.Client;
 
 import java.net.SocketException;
+import java.util.List;
 
 /**
  * 扫描器，获取所有潜在的客户端
@@ -20,6 +21,8 @@ public interface Scan {
     void stopScan();
 
     void addListener(ScanListener listener);
+
+    List<ScanListener> getListener();
 
     /**
      * 成功获取到客户端的回调
