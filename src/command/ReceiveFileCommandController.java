@@ -110,6 +110,20 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
      */
     @Override
     public void accept() {
+        // 如果在主线程的话，放到子线程中执行
+        if (config.isMainThread()) {
+            config.commandPool().execute(new Runnable() {
+                @Override
+                public void run() {
+                    runAccept();
+                }
+            });
+        } else {
+            runAccept();
+        }
+    }
+
+    private void runAccept() {
         try {
             if (isConnection()) {
                 // 将接受文件的纪录保存下来
@@ -131,6 +145,19 @@ public class ReceiveFileCommandController implements Runnable, AcceptController 
      */
     @Override
     public void reject() {
+        if (config.isMainThread()) {
+            config.commandPool().execute(new Runnable() {
+                @Override
+                public void run() {
+                    runReject();
+                }
+            });
+        } else {
+            runReject();
+        }
+    }
+
+    private void runReject() {
         try {
             commandDataOutputStream = new DataOutputStream(socket.getOutputStream());
             commandDataOutputStream.writeUTF("2,0,0");

@@ -43,6 +43,12 @@ public abstract class Configuration {
     public abstract String decodeString(String str) throws UnsupportedEncodingException;
 
     /**
+     * 判断是否是主线程
+     * @return
+     */
+    public abstract Boolean isMainThread();
+
+    /**
      * 获取自己名称
      * @return
      */

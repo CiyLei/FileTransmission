@@ -11,8 +11,10 @@ import java.util.*;
  */
 public class DefaultConfiguration extends Configuration {
 
+    private long mainThreadId;
     public DefaultConfiguration(CommandListener listener) {
         super(listener);
+        mainThreadId = Thread.currentThread().getId();
     }
 
     /**
@@ -27,6 +29,15 @@ public class DefaultConfiguration extends Configuration {
     @Override
     public String decodeString(String str) throws UnsupportedEncodingException {
         return new String(Base64.getDecoder().decode(str), stringEncode());
+    }
+
+    /**
+     * 视为创建这个Config类的为主线程
+     * @return
+     */
+    @Override
+    public Boolean isMainThread() {
+        return mainThreadId == Thread.currentThread().getId();
     }
 
     /**
