@@ -36,7 +36,7 @@ public class TransmissionFileInfo {
         return fileHash;
     }
 
-    public double getProgress() {
+    public synchronized double getProgress() {
         Long sunSize = 0l;
         for (TransmissionSectionFileInfo sectionFileInfo : sectionFileInfos) {
             sunSize += sectionFileInfo.getFinishIndex() - sectionFileInfo.getStartIndex();

@@ -33,7 +33,7 @@ public class ReceiveFileSocketController implements Runnable{
                 Long startIndex = dataInputStream.readLong();
                 Long endIndex = dataInputStream.readLong();
                 Long finishIndex = dataInputStream.readLong();
-                System.out.println(this + "分到的位置 start:" + startIndex + " end:" + endIndex);
+                System.out.println(this + "分到的位置 start:" + startIndex + " end:" + endIndex + " finish:" + finishIndex);
                 TransmissionSectionFileInfo sectionFileInfo = new TransmissionSectionFileInfo(startIndex, endIndex, finishIndex);
                 transmissionFileInfo.getSectionFileInfos().add(sectionFileInfo);
                 createSaveFilePath(config.saveFilePath());
@@ -44,15 +44,15 @@ public class ReceiveFileSocketController implements Runnable{
                 int len = -1;
                 // 保持一段时间再更新一下
                 Long ct = System.currentTimeMillis();
-                Long sunSize = 0l;
+//                Long sunSize = 0l;
                 while((len = socket.getInputStream().read(buffer)) != -1){
                     randomAccessFile.write(buffer, 0, len);
-                    sunSize += len;
+//                    sunSize += len;
                     if (System.currentTimeMillis() - ct >= config.sendFileUpdateFrequency()) {
                         sectionFileInfo.setFinishIndex(randomAccessFile.getFilePointer());
                         client.receiveFileUpdate(transmissionFileInfo);
                         ct = System.currentTimeMillis();
-                        sunSize = 0l;
+//                        sunSize = 0l;
                     }
                 }
                 sectionFileInfo.setFinishIndex(randomAccessFile.getFilePointer());
