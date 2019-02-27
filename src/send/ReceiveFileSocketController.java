@@ -61,7 +61,7 @@ public class ReceiveFileSocketController implements Runnable{
                 sectionFileInfo.setFinishIndex(randomAccessFile.getFilePointer());
                 client.receiveFileUpdate(transmissionFileInfo);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
 //            e.printStackTrace();
             colse();
         }
