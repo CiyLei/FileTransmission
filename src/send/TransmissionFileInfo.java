@@ -3,6 +3,7 @@ package send;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * 传输过程中的文件信息
@@ -11,9 +12,9 @@ public class TransmissionFileInfo {
     private String fileName;
     private Long fileSize;
     private String fileHash;
-    private List<TransmissionSectionFileInfo> sectionFileInfos;
+    private Vector<TransmissionSectionFileInfo> sectionFileInfos;
 
-    public TransmissionFileInfo(String fileName, Long fileSize, String fileHash, List<TransmissionSectionFileInfo> sectionFileInfos) {
+    public TransmissionFileInfo(String fileName, Long fileSize, String fileHash, Vector<TransmissionSectionFileInfo> sectionFileInfos) {
         this.fileName = fileName;
         this.fileSize = fileSize;
         this.fileHash = fileHash;
@@ -21,7 +22,7 @@ public class TransmissionFileInfo {
     }
 
     public TransmissionFileInfo(String fileName, Long fileSize, String fileHash) {
-        this(fileName, fileSize, fileHash, new ArrayList<>());
+        this(fileName, fileSize, fileHash, new Vector<>());
     }
 
     public String getFileName() {
@@ -48,7 +49,7 @@ public class TransmissionFileInfo {
         return sectionFileInfos;
     }
 
-    public void setSectionFileInfos(List<TransmissionSectionFileInfo> sectionFileInfos) {
+    public void setSectionFileInfos(Vector<TransmissionSectionFileInfo> sectionFileInfos) {
         this.sectionFileInfos = sectionFileInfos;
     }
 }

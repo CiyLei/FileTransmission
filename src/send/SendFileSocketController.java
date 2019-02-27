@@ -10,6 +10,7 @@ import java.io.RandomAccessFile;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 public class SendFileSocketController {
     private Configuration config;
@@ -32,7 +33,7 @@ public class SendFileSocketController {
             TransmissionFileInfo transmissionFileInfo = config.getTransmissionFileInfoForSendClient(client);
             // 如果此客户端发送任务的hash值与要发送文件的hash对不上，或者没有发送任务，初始化分割任务
             if (!transmissionFileInfo.getFileHash().equals(fileInfo.getFileHashValue()) || transmissionFileInfo.getSectionFileInfos().isEmpty()) {
-                List<TransmissionSectionFileInfo> sectionFileInfos = new ArrayList<>();
+                Vector<TransmissionSectionFileInfo> sectionFileInfos = new Vector<>();
                 Long average = fileInfo.getFile().length() / config.sendFileTaskThreadCount();
                 for (int i = 0; i < config.sendFileTaskThreadCount(); i++) {
                     Long endIndex = (i + 1) * average - 1;
