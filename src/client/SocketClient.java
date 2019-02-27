@@ -1,6 +1,6 @@
 package client;
 
-import command.CommandSocket;
+import command.SendFileCommandSocket;
 import config.Configuration;
 import send.SendFileSocketController;
 import send.TransmissionFileInfo;
@@ -14,7 +14,7 @@ import java.io.File;
 public class SocketClient extends Client {
 
     // 命令管理socket
-    private CommandSocket sendFileInfoController;
+    private SendFileCommandSocket sendFileInfoController;
     private Configuration config;
 
     /**
@@ -27,7 +27,7 @@ public class SocketClient extends Client {
     public SocketClient(String hostAddress, String hostName, Integer commandPort, Configuration configuration) {
         super(hostAddress, hostName, commandPort, configuration);
         this.config = configuration;
-        sendFileInfoController = new CommandSocket(hostAddress, commandPort, configuration, this);
+        sendFileInfoController = new SendFileCommandSocket(hostAddress, commandPort, configuration, this);
     }
 
     @Override

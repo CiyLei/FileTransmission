@@ -32,14 +32,14 @@ public class Main {
                             System.out.println("发送文件:" + client.getSendTransmissionFileInfo().getFileName() + " 进度:" + client.getSendTransmissionFileInfo().getProgress());
                         }
                     });
-                    try {
-                        Thread.sleep(1000);
-                        File file = new File("C:\\Users\\LENOVO\\Desktop\\QQ_V6.5.2.dmg");
-                        System.out.println("开始发送文件信息 name：" + file.getName() + " size:" + file.length());
-                        client.sendFile(file);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+//                    try {
+//                        Thread.sleep(1000);
+//                        File file = new File("C:\\Users\\LENOVO\\Desktop\\QQ_V6.5.2.dmg");
+//                        System.out.println("开始发送文件信息 name：" + file.getName() + " size:" + file.length());
+//                        client.sendFile(file);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
                 }
 
                 @Override
@@ -47,7 +47,7 @@ public class Main {
                     System.out.println("扫描完毕");
                 }
             });
-            scan.startScan();
+//            scan.startScan();
         } catch (IOException e) {
             e.printStackTrace();
         }

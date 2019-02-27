@@ -11,9 +11,9 @@ import java.util.List;
 public interface CommandListener {
     /**
      * 监听到有客户端要发送文件给我
-     * @param transmissionFIleInfo
+     * @param transmissionFileInfo
      */
-    void onFileInfoListener(TransmissionFileInfo transmissionFIleInfo, AcceptController controller);
+    void onFileInfoListener(TransmissionFileInfo transmissionFileInfo, AcceptController controller);
 
     /**
      * 监听到接收端是否同意接收文件的命令

@@ -6,7 +6,7 @@ import client.Client;
 import client.SocketClient;
 import command.AcceptController;
 import command.CommandListener;
-import command.CommandServerSocket;
+import command.ReceiveFileCommandServerSocket;
 import send.SendFileServerSocket;
 import send.TransmissionFileInfo;
 
@@ -17,13 +17,13 @@ public class FileTransmission implements CommandListener {
 
     private Configuration configuration;
     private Scan broadcastScan;
-    private CommandServerSocket commandServerSocket;
+    private ReceiveFileCommandServerSocket commandServerSocket;
     private SendFileServerSocket sendFileServerSocket;
 
     public FileTransmission() throws IOException {
         this.configuration = new DefaultConfiguration(this);
         this.broadcastScan = new BroadcastScan(this.configuration);
-        this.commandServerSocket = new CommandServerSocket(this.configuration, broadcastScan.getListener());
+        this.commandServerSocket = new ReceiveFileCommandServerSocket(this.configuration, broadcastScan.getListener());
         this.sendFileServerSocket = new SendFileServerSocket(this.configuration);
     }
 
@@ -34,7 +34,7 @@ public class FileTransmission implements CommandListener {
     public FileTransmission(Configuration configuration) throws IOException {
         this.configuration = configuration;
         this.broadcastScan = new BroadcastScan(configuration);
-        this.commandServerSocket = new CommandServerSocket(configuration, broadcastScan.getListener());
+        this.commandServerSocket = new ReceiveFileCommandServerSocket(configuration, broadcastScan.getListener());
         this.sendFileServerSocket = new SendFileServerSocket(this.configuration);
     }
 
@@ -58,10 +58,10 @@ public class FileTransmission implements CommandListener {
     }
 
     @Override
-    public void onFileInfoListener(TransmissionFileInfo transmissionFIleInfo, AcceptController controller) {
-        System.out.println("获取到了文件信息 name：" + transmissionFIleInfo.getFileName() + " size:" + transmissionFIleInfo.getFileSize() + " hash:" + transmissionFIleInfo.getFileHash());
-        controller.accept();
-        System.out.println("我同意接收这个文件 name：" + transmissionFIleInfo.getFileName() + " size:" + transmissionFIleInfo.getFileSize() + " hash:" + transmissionFIleInfo.getFileHash());
+    public void onFileInfoListener(TransmissionFileInfo transmissionFileInfo, AcceptController controller) {
+        System.out.println("获取到了文件信息 name：" + transmissionFileInfo.getFileName() + " size:" + transmissionFileInfo.getFileSize() + " hash:" + transmissionFileInfo.getFileHash());
+        controller.accept(transmissionFileInfo);
+        System.out.println("我同意接收这个文件 name：" + transmissionFileInfo.getFileName() + " size:" + transmissionFileInfo.getFileSize() + " hash:" + transmissionFileInfo.getFileHash());
     }
 
     @Override
@@ -76,7 +76,7 @@ public class FileTransmission implements CommandListener {
 
     @Override
     public void onCliensCountChange(List<Client> clients) {
-        System.out.println("当前客户:" + clients);
+//        System.out.println("当前客户:" + clients);
     }
 
 }

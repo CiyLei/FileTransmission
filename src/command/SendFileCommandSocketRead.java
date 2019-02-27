@@ -1,26 +1,31 @@
 package command;
 
 import client.Client;
-import client.FileInfo;
 import config.Configuration;
 import send.TransmissionFileInfo;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
 /**
- * commandSocket专门写的类
+ * 发送端命令Socket的分析信息类
+ * 作为发送端，只负责分析type为2和4的信息分析
+ *
+ * type,data...
+ * type为1则表示发送文件信息:                                                                                    1,Base64(文件名),文件大小,文件hash值
+ * type为2则表示确认是否接收(第2位0表示拒绝，1表示接收。第3位表示发送文件的端口号，拒绝的就传0):                     2,1,2333
+ * type为3则表示开始任务(发送端点击开始，则会发送3过来，我们在分析接受的情况返回4，接收端点击开始就直接发送4):        3,文件hash值
+ * type为4则表示返回接收端自身接收情况:                                                                           4,startIndex|finishIndex|endIndex,...
  */
-public class CommandSocketWrite implements Runnable {
+public class SendFileCommandSocketRead implements Runnable{
+
     private Socket socket;
     private Client client;
-    private DataOutputStream commandDataOutputStream;
     private DataInputStream commandDatainputStream;
     private Configuration config;
 
-    public CommandSocketWrite(Socket socket, Client client, Configuration config) {
+    public SendFileCommandSocketRead(Socket socket, Client client, Configuration config) {
         this.socket = socket;
         this.client = client;
         this.config = config;
@@ -29,39 +34,11 @@ public class CommandSocketWrite implements Runnable {
     @Override
     public void run() {
         connection();
-    }
-
-    public void connection() {
-        try {
-            if (commandDataOutputStream == null)
-                commandDataOutputStream = new DataOutputStream(socket.getOutputStream());
-            if (commandDatainputStream == null)
-                commandDatainputStream = new DataInputStream(socket.getInputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public Boolean isConnection() {
-        return commandDatainputStream != null && commandDataOutputStream != null;
-    }
-
-    public void sendFileInfo(FileInfo file) {
-        if (!isConnection())
-            connection();
         if (isConnection()) {
             try {
-                // 发送文件信息
-                String fileName = file.getFile().getName();
-                String fileSize = String.valueOf(file.getFile().length());
-                String fileHash = file.getFileHashValue();
-                String data = "1," + config.encodeString(fileName) + "," + fileSize + "," + fileHash;
-                commandDataOutputStream.writeUTF(data);
-                commandDataOutputStream.flush();
                 // 收到回复信息
-                String replyMsg = commandDatainputStream.readUTF();
-                System.out.println("我是CommandSocketSend 回复信息:" + replyMsg);
-                if (null != replyMsg && !replyMsg.isEmpty()) {
+                while (true) {
+                    String replyMsg = commandDatainputStream.readUTF();
                     //分析回复信息
                     analysisReplyMsg(replyMsg);
                 }
@@ -72,27 +49,39 @@ public class CommandSocketWrite implements Runnable {
         }
     }
 
+    public void connection() {
+        try {
+            if (commandDatainputStream == null)
+                commandDatainputStream = new DataInputStream(socket.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+            colse();
+        }
+    }
+
+    public Boolean isConnection() {
+        return commandDatainputStream != null;
+    }
+
     public void colse() {
         try {
-            if (commandDataOutputStream != null)
-                commandDataOutputStream.close();
             if (commandDatainputStream != null)
                 commandDatainputStream.close();
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-        commandDataOutputStream = null;
         commandDatainputStream = null;
     }
 
     /**
-     * 处理是否同意了接收文件的信息
+     * 分析回复信息
      * @param replyMsg
      */
     private void analysisReplyMsg(String replyMsg) {
         String[] split = replyMsg.split(",");
         if (split.length > 0) {
             switch (Integer.parseInt(split[0])) {
+                // 回复了是否接收文件的信息，这里分析进行回调
                 case 2:
                     if (split.length == 3 && config.getListener() != null) {
                         Boolean accept = split[1].trim().equals("1");
@@ -103,6 +92,10 @@ public class CommandSocketWrite implements Runnable {
                         }
                         client.replyIsAccept(accept, sendFilePort);
                     }
+                    break;
+                    // 开始
+                case 4:
+
                     break;
             }
         }

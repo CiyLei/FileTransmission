@@ -50,13 +50,13 @@ public class BroadcastScan implements Scan {
                     if (!isFinish)
                         return;
                 }
+                tasks.clear();
+                for (Scan.ScanListener listener : listeners)
+                    listener.onFinish();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        tasks.clear();
-        for (Scan.ScanListener listener : listeners)
-            listener.onFinish();
     }
 
     @Override
