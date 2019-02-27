@@ -112,7 +112,7 @@ public abstract class Client {
 
     public void startReceiveFile() {
         if (getCommandServerSocketWrite() != null && getReceiveFile() != null) {
-            getCommandServerSocketWrite().sendStartTransmissionFileInfo(sendTransmissionFileInfo);
+            getCommandServerSocketWrite().sendStartTransmissionFileInfo(getReceiveFile());
         }
     }
 

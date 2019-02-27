@@ -80,6 +80,7 @@ public class ReceiveFileCommandServerSocketWrite implements Runnable , AcceptCon
                     sb.append(sectionFileInfo.getFinishIndex());
                     sb.append(",");
                 }
+                transmissionFileInfo.getSectionFileInfos().clear();
                 commandDataOutputStream.writeUTF(sb.toString());
                 commandDataOutputStream.flush();
             }
