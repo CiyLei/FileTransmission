@@ -41,9 +41,11 @@ public class SendFileSocketController {
                         endIndex = fileInfo.getFile().length() - 1;
                     TransmissionSectionFileInfo sectionFileInfo = new TransmissionSectionFileInfo(i * average, endIndex, i * average);
                     sectionFileInfos.add(sectionFileInfo);
-                    config.sendFilePool().execute(new SendFileTask(transmissionFileInfo, i, receiveAddress, receivePort));
                 }
                 transmissionFileInfo.setSectionFileInfos(sectionFileInfos);
+                for (int i = 0; i < transmissionFileInfo.getSectionFileInfos().size(); i++) {
+                    config.sendFilePool().execute(new SendFileTask(transmissionFileInfo, i, receiveAddress, receivePort));
+                }
             } else {
                 // 如果是继续发送任务
                 for (int i = 0; i < transmissionFileInfo.getSectionFileInfos().size(); i++) {
