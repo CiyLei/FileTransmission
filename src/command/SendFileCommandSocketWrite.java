@@ -39,7 +39,7 @@ public class SendFileCommandSocketWrite implements Runnable {
         return commandDataOutputStream != null;
     }
 
-    public void sendFileInfo(FileInfo file) {
+    public void sendFileMessage(FileInfo file) {
         connection();
         if (isConnection()) {
             try {
@@ -48,6 +48,20 @@ public class SendFileCommandSocketWrite implements Runnable {
                 String fileSize = String.valueOf(file.getFile().length());
                 String fileHash = file.getFileHashValue();
                 String data = "1," + config.encodeString(fileName) + "," + fileSize + "," + fileHash;
+                commandDataOutputStream.writeUTF(data);
+                commandDataOutputStream.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+                colse();
+            }
+        }
+    }
+
+    public void sendStartMessage(String fileHash) {
+        connection();
+        if (isConnection()) {
+            try {
+                String data = "3," + fileHash;
                 commandDataOutputStream.writeUTF(data);
                 commandDataOutputStream.flush();
             } catch (IOException e) {

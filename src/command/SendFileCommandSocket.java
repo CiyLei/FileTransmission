@@ -52,12 +52,19 @@ public class SendFileCommandSocket {
         return commandSocket != null && commandSocket.isConnected();
     }
 
-    public void sendFileInfo(FileInfo file) {
+    public void sendFileMessage(FileInfo file) {
         if (!isConnection())
             connection();
         if (isConnection()) {
-            commandSocketWrite.sendFileInfo(file);
+            commandSocketWrite.sendFileMessage(file);
         }
     }
 
+    public void sendStartMessage(String fileHash) {
+        if (!isConnection())
+            connection();
+        if (isConnection()) {
+            commandSocketWrite.sendStartMessage(fileHash);
+        }
+    }
 }

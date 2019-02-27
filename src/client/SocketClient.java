@@ -15,6 +15,7 @@ public class SocketClient extends Client {
 
     // 命令管理socket
     private SendFileCommandSocket sendFileInfoController;
+    private SendFileSocketController sendFileSocketController;
     private Configuration config;
 
     /**
@@ -37,6 +38,23 @@ public class SocketClient extends Client {
         }
     }
 
+    @Override
+    public void startSendFile() {
+        config.commandPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                if (sendFileInfoController != null)
+                    sendFileInfoController.sendStartMessage(sendFile.getFileHashValue());
+            }
+        });
+    }
+
+    @Override
+    public void pauseSendFile() {
+        if (sendFileSocketController != null)
+            sendFileSocketController.stop();
+    }
+
     /**
      * 分析文件（主要是获取文件的hash值）
      * @param file
@@ -49,7 +67,7 @@ public class SocketClient extends Client {
                     String hash = MD5Util.md5HashCode(file.getPath());
                     sendFile = new FileInfo(file, hash);
                     // 发送文件信息给接收端
-                    sendFileInfoController.sendFileInfo(sendFile);
+                    sendFileInfoController.sendFileMessage(sendFile);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -99,7 +117,8 @@ public class SocketClient extends Client {
      */
     private void startSendFile(Integer sendFilePort) {
         if (sendFile != null && !sendFile.getFileHashValue().isEmpty()) {
-            new SendFileSocketController(config, sendFile, getHostAddress(), sendFilePort).start();
+            sendFileSocketController = new SendFileSocketController(config, sendFile, getHostAddress(), sendFilePort);
+            sendFileSocketController.start();
         }
     }
 }

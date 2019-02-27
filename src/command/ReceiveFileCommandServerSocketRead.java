@@ -71,6 +71,7 @@ public class ReceiveFileCommandServerSocketRead implements Runnable {
                     }
                     break;
                 case 3:
+                    System.out.println("尔等想停?");
                     break;
             }
         }

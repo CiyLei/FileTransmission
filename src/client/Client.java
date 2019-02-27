@@ -40,6 +40,10 @@ public abstract class Client {
 
     public abstract void sendFile(File file);
 
+    public abstract void startSendFile();
+
+    public abstract void pauseSendFile();
+
     public TransmissionFileInfo getReceiveTransmissionFileInfo() {
         return receiveTransmissionFileInfo;
     }

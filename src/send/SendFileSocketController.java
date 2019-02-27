@@ -14,6 +14,7 @@ public class SendFileSocketController {
     private FileInfo fileInfo;
     private String receiveAddress;
     private Integer receivePort;
+    private Boolean isStart;
 
     public SendFileSocketController(Configuration config, FileInfo fileInfo, String receiveAddress, Integer sendFilePort) {
         this.config = config;
@@ -23,6 +24,7 @@ public class SendFileSocketController {
     }
 
     public void start() {
+        isStart = true;
         Long average = fileInfo.getFile().length() / config.sendFileTaskThreadCount();
         for (int i = 0; i < config.sendFileTaskThreadCount(); i++) {
             Long endIndex = (i + 1) * average - 1;
@@ -31,6 +33,10 @@ public class SendFileSocketController {
                 endIndex = fileInfo.getFile().length() - 1;
             config.sendFilePool().execute(new SendFileTask(fileInfo, i * average, endIndex, receiveAddress, receivePort));
         }
+    }
+
+    public void stop() {
+        isStart = false;
     }
 
     public class SendFileTask implements Runnable{
@@ -88,7 +94,7 @@ public class SendFileSocketController {
                         // 保持一段时间再更新一下
                         Long ct = System.currentTimeMillis();
                         Long sunSize = 0l;
-                        while (true) {
+                        while (isStart) {
                             if (randomAccessFile.getFilePointer() + buffer.length - 1 < endIndex) {
                                 if (randomAccessFile.read(buffer) != -1) {
                                     dataOutputStream.write(buffer);
