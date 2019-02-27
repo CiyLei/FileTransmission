@@ -78,7 +78,7 @@ public class ReceiveFileCommandServerSocketRead implements Runnable {
                         // 如果有为接收完毕的任务的话
                         if (fileHash.equals(transmissionFileInfo.getFileHash()) && !transmissionFileInfo.getSectionFileInfos().isEmpty()) {
 //                            System.out.println("你想开始:" + fileHash + " " + transmissionFileInfo.getSectionFileInfos());
-
+                            commandServerSocketWrite.sendStartTransmissionFileInfo(transmissionFileInfo);
                         }
                     }
                     break;

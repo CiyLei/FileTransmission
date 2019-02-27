@@ -39,7 +39,7 @@ public class ReceiveFileSocketController implements Runnable{
                 createSaveFilePath(config.saveFilePath());
                 File file = new File(config.saveFilePath() + transmissionFileInfo.getFileName());
                 randomAccessFile = new RandomAccessFile(file, "rwd");
-                randomAccessFile.seek(startIndex);
+                randomAccessFile.seek(finishIndex);
                 byte[] buffer = new byte[1024 * 4];
                 int len = -1;
                 // 保持一段时间再更新一下
