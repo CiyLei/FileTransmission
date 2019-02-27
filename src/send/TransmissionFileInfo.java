@@ -1,5 +1,9 @@
 package send;
 
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 传输过程中的文件信息
  */
@@ -7,17 +11,17 @@ public class TransmissionFileInfo {
     private String fileName;
     private Long fileSize;
     private String fileHash;
-    private volatile Long currentSize;
+    private List<TransmissionSectionFileInfo> sectionFileInfos;
 
-    public TransmissionFileInfo(String fileName, Long fileSize, String fileHash, Long currentSize) {
+    public TransmissionFileInfo(String fileName, Long fileSize, String fileHash, List<TransmissionSectionFileInfo> sectionFileInfos) {
         this.fileName = fileName;
         this.fileSize = fileSize;
         this.fileHash = fileHash;
-        this.currentSize = currentSize;
+        this.sectionFileInfos = sectionFileInfos;
     }
 
     public TransmissionFileInfo(String fileName, Long fileSize, String fileHash) {
-        this(fileName, fileSize, fileHash, 0l);
+        this(fileName, fileSize, fileHash, new ArrayList<>());
     }
 
     public String getFileName() {
@@ -33,14 +37,18 @@ public class TransmissionFileInfo {
     }
 
     public double getProgress() {
-        return currentSize.doubleValue() / fileSize.doubleValue();
+        Long sunSize = 0l;
+        for (TransmissionSectionFileInfo sectionFileInfo : sectionFileInfos) {
+            sunSize += sectionFileInfo.getFinishIndex() - sectionFileInfo.getStartIndex();
+        }
+        return sunSize.doubleValue() / fileSize.doubleValue();
     }
 
-    public Long getCurrentSize() {
-        return currentSize;
+    public List<TransmissionSectionFileInfo> getSectionFileInfos() {
+        return sectionFileInfos;
     }
 
-    public synchronized void addSize(Long size) {
-        currentSize += size;
+    public void setSectionFileInfos(List<TransmissionSectionFileInfo> sectionFileInfos) {
+        this.sectionFileInfos = sectionFileInfos;
     }
 }

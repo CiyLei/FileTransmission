@@ -29,10 +29,13 @@ public class ReceiveFileSocketController implements Runnable{
             Client client = config.getClient(socket.getInetAddress().getHostAddress());
             TransmissionFileInfo transmissionFileInfo = config.getTransmissionFileInfoForReceiveClient(client);
             // 根据文件hash值确保文件之前被确认接收过
-            if (transmissionFileInfo != null) {
+            if (transmissionFileInfo != null && fileHash.equals(transmissionFileInfo.getFileHash())) {
                 Long startIndex = dataInputStream.readLong();
                 Long endIndex = dataInputStream.readLong();
+                Long finishIndex = dataInputStream.readLong();
                 System.out.println(this + "分到的位置 start:" + startIndex + " end:" + endIndex);
+                TransmissionSectionFileInfo sectionFileInfo = new TransmissionSectionFileInfo(startIndex, endIndex, finishIndex);
+                transmissionFileInfo.getSectionFileInfos().add(sectionFileInfo);
                 createSaveFilePath(config.saveFilePath());
                 File file = new File(config.saveFilePath() + transmissionFileInfo.getFileName());
                 randomAccessFile = new RandomAccessFile(file, "rwd");
@@ -46,13 +49,13 @@ public class ReceiveFileSocketController implements Runnable{
                     randomAccessFile.write(buffer, 0, len);
                     sunSize += len;
                     if (System.currentTimeMillis() - ct >= config.sendFileUpdateFrequency()) {
-                        transmissionFileInfo.addSize(sunSize);
+                        sectionFileInfo.setFinishIndex(randomAccessFile.getFilePointer());
                         client.receiveFileUpdate(transmissionFileInfo);
                         ct = System.currentTimeMillis();
                         sunSize = 0l;
                     }
                 }
-                transmissionFileInfo.addSize(sunSize);
+                sectionFileInfo.setFinishIndex(randomAccessFile.getFilePointer());
                 client.receiveFileUpdate(transmissionFileInfo);
             }
         } catch (IOException e) {

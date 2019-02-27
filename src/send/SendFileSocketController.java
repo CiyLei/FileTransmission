@@ -8,6 +8,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SendFileSocketController {
     private Configuration config;
@@ -25,13 +27,29 @@ public class SendFileSocketController {
 
     public void start() {
         isStart = true;
-        Long average = fileInfo.getFile().length() / config.sendFileTaskThreadCount();
-        for (int i = 0; i < config.sendFileTaskThreadCount(); i++) {
-            Long endIndex = (i + 1) * average - 1;
-            // 最后一个全包了
-            if (i == config.sendFileTaskThreadCount() - 1)
-                endIndex = fileInfo.getFile().length() - 1;
-            config.sendFilePool().execute(new SendFileTask(fileInfo, i * average, endIndex, receiveAddress, receivePort));
+        Client client = config.getClient(receiveAddress);
+        if (client != null) {
+            TransmissionFileInfo transmissionFileInfo = config.getTransmissionFileInfoForSendClient(client);
+            // 如果此客户端发送任务的hash值与要发送文件的hash对不上，或者没有发送任务，初始化分割任务
+            if (!transmissionFileInfo.getFileHash().equals(fileInfo.getFileHashValue()) || transmissionFileInfo.getSectionFileInfos().isEmpty()) {
+                List<TransmissionSectionFileInfo> sectionFileInfos = new ArrayList<>();
+                Long average = fileInfo.getFile().length() / config.sendFileTaskThreadCount();
+                for (int i = 0; i < config.sendFileTaskThreadCount(); i++) {
+                    Long endIndex = (i + 1) * average - 1;
+                    // 最后一个全包了
+                    if (i == config.sendFileTaskThreadCount() - 1)
+                        endIndex = fileInfo.getFile().length() - 1;
+                    TransmissionSectionFileInfo sectionFileInfo = new TransmissionSectionFileInfo(i * average, endIndex, i * average);
+                    sectionFileInfos.add(sectionFileInfo);
+                    config.sendFilePool().execute(new SendFileTask(transmissionFileInfo, i, receiveAddress, receivePort));
+                }
+                transmissionFileInfo.setSectionFileInfos(sectionFileInfos);
+            } else {
+                // 如果是继续发送任务
+                for (int i = 0; i < transmissionFileInfo.getSectionFileInfos().size(); i++) {
+                    config.sendFilePool().execute(new SendFileTask(transmissionFileInfo, i, receiveAddress, receivePort));
+                }
+            }
         }
     }
 
@@ -40,9 +58,8 @@ public class SendFileSocketController {
     }
 
     public class SendFileTask implements Runnable{
-        private FileInfo fileInfo;
-        private Long startIndex;
-        private Long endIndex;
+        private TransmissionFileInfo transmissionFileInfo;
+        private Integer sectionIndex;
         // 接收者的ip和端口号
         private String receiveAddress;
         private Integer receivePort;
@@ -50,10 +67,9 @@ public class SendFileSocketController {
         private RandomAccessFile randomAccessFile;
         private DataOutputStream dataOutputStream;
 
-        public SendFileTask(FileInfo fileInfo, Long startIndex, Long endIndex, String receiveAddress, Integer receivePort) {
-            this.fileInfo = fileInfo;
-            this.startIndex = startIndex;
-            this.endIndex = endIndex;
+        public SendFileTask(TransmissionFileInfo transmissionFileInfo, Integer sectionIndex, String receiveAddress, Integer receivePort) {
+            this.transmissionFileInfo = transmissionFileInfo;
+            this.sectionIndex = sectionIndex;
             this.receiveAddress = receiveAddress;
             this.receivePort = receivePort;
             connection();
@@ -80,52 +96,54 @@ public class SendFileSocketController {
             if (isConnection()) {
                 try {
                     Client client = config.getClient(socket.getInetAddress().getHostAddress());
-                    TransmissionFileInfo transmissionFileInfo = config.getTransmissionFileInfoForSendClient(client);
-                    if (client != null && transmissionFileInfo != null) {
+                    if (client != null) {
                         // 先发送文件的hash,让接收端确认
-                        dataOutputStream.writeUTF(fileInfo.getFileHashValue());
+                        dataOutputStream.writeUTF(transmissionFileInfo.getFileHash());
                         dataOutputStream.flush();
-                        // 先发送文件的开始索引
-                        dataOutputStream.writeLong(startIndex);
+                        // 再发送文件的开始索引
+                        dataOutputStream.writeLong(transmissionFileInfo.getSectionFileInfos().get(sectionIndex).getStartIndex());
                         dataOutputStream.flush();
-                        // 先发送文件的结束索引
-                        dataOutputStream.writeLong(endIndex);
+                        // 再发送文件的结束索引
+                        dataOutputStream.writeLong(transmissionFileInfo.getSectionFileInfos().get(sectionIndex).getEndIndex());
+                        dataOutputStream.flush();
+                        // 再发送文件的完成进度索引
+                        dataOutputStream.writeLong(transmissionFileInfo.getSectionFileInfos().get(sectionIndex).getFinishIndex());
                         dataOutputStream.flush();
                         // 再取文件发送数据
-                        randomAccessFile.seek(startIndex);
+                        randomAccessFile.seek(transmissionFileInfo.getSectionFileInfos().get(sectionIndex).getFinishIndex());
                         byte[] buffer = new byte[1024 * 4];
                         // 保持一段时间再更新一下
                         Long ct = System.currentTimeMillis();
-                        Long sunSize = 0l;
+//                        Long sunSize = 0l;
                         while (isStart) {
-                            if (randomAccessFile.getFilePointer() + buffer.length - 1 < endIndex) {
+                            if (randomAccessFile.getFilePointer() + buffer.length - 1 < transmissionFileInfo.getSectionFileInfos().get(sectionIndex).getEndIndex()) {
                                 if (randomAccessFile.read(buffer) != -1) {
                                     dataOutputStream.write(buffer);
 //                                    dataOutputStream.flush();
 
-                                    sunSize += buffer.length;
+//                                    sunSize += buffer.length;
                                     if (System.currentTimeMillis() - ct >= config.sendFileUpdateFrequency()) {
-                                        transmissionFileInfo.addSize(sunSize);
+                                        transmissionFileInfo.getSectionFileInfos().get(sectionIndex).setFinishIndex(randomAccessFile.getFilePointer());
                                         client.sendFileUpdate(transmissionFileInfo);
                                         ct = System.currentTimeMillis();
-                                        sunSize = 0l;
+//                                        sunSize = 0l;
                                     }
                                 }
                             } else {
-                                buffer = new byte[(int) (endIndex - randomAccessFile.getFilePointer() + 1)];
+                                buffer = new byte[(int) (transmissionFileInfo.getSectionFileInfos().get(sectionIndex).getEndIndex() - randomAccessFile.getFilePointer() + 1)];
                                 if (randomAccessFile.read(buffer) != -1) {
                                     dataOutputStream.write(buffer);
                                     dataOutputStream.flush();
-                                    transmissionFileInfo.addSize(sunSize + buffer.length);
+                                    transmissionFileInfo.getSectionFileInfos().get(sectionIndex).setFinishIndex(randomAccessFile.getFilePointer());
                                     client.sendFileUpdate(transmissionFileInfo);
-                                    sunSize = 0l;
+//                                    sunSize = 0l;
                                 }
-                                break;
+                                return;
                             }
                         }
                         // 如果中途暂停了
-                        if (sunSize > 0l && !isStart) {
-                            transmissionFileInfo.addSize(sunSize);
+                        if (!isStart) {
+                            transmissionFileInfo.getSectionFileInfos().get(sectionIndex).setFinishIndex(randomAccessFile.getFilePointer());
                             client.sendFileUpdate(transmissionFileInfo);
                         }
                     }
