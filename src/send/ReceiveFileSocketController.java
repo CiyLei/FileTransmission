@@ -33,7 +33,7 @@ public class ReceiveFileSocketController implements Runnable{
                 Long startIndex = dataInputStream.readLong();
                 Long endIndex = dataInputStream.readLong();
                 Long finishIndex = dataInputStream.readLong();
-                System.out.println(this + "分到的位置 start:" + startIndex + " end:" + endIndex + " finish:" + finishIndex);
+//                System.out.println(this + "分到的位置 start:" + startIndex + " end:" + endIndex + " finish:" + finishIndex);
                 TransmissionSectionFileInfo sectionFileInfo = new TransmissionSectionFileInfo(startIndex, endIndex, finishIndex);
                 transmissionFileInfo.getSectionFileInfos().add(sectionFileInfo);
                 createSaveFilePath(config.saveFilePath());
