@@ -29,4 +29,13 @@ public class TransmissionSectionFileInfo {
     public void setFinishIndex(Long finishIndex) {
         this.finishIndex = finishIndex;
     }
+
+    @Override
+    public String toString() {
+        return "TransmissionSectionFileInfo{" +
+                "startIndex=" + startIndex +
+                ", endIndex=" + endIndex +
+                ", finishIndex=" + finishIndex +
+                '}';
+    }
 }
