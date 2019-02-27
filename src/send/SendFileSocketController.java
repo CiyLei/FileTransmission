@@ -88,6 +88,9 @@ public class SendFileSocketController {
                         // 先发送文件的开始索引
                         dataOutputStream.writeLong(startIndex);
                         dataOutputStream.flush();
+                        // 先发送文件的结束索引
+                        dataOutputStream.writeLong(endIndex);
+                        dataOutputStream.flush();
                         // 再取文件发送数据
                         randomAccessFile.seek(startIndex);
                         byte[] buffer = new byte[1024 * 4];

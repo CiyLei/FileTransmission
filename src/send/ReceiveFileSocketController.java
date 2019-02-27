@@ -31,7 +31,8 @@ public class ReceiveFileSocketController implements Runnable{
             // 根据文件hash值确保文件之前被确认接收过
             if (transmissionFileInfo != null) {
                 Long startIndex = dataInputStream.readLong();
-//                System.out.println(this + " start:" + startIndex);
+                Long endIndex = dataInputStream.readLong();
+                System.out.println(this + "分到的位置 start:" + startIndex + " end:" + endIndex);
                 createSaveFilePath(config.saveFilePath());
                 File file = new File(config.saveFilePath() + transmissionFileInfo.getFileName());
                 randomAccessFile = new RandomAccessFile(file, "rwd");
