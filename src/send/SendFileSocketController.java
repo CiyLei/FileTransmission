@@ -115,9 +115,15 @@ public class SendFileSocketController {
                                     dataOutputStream.flush();
                                     transmissionFileInfo.addSize(sunSize + buffer.length);
                                     client.sendFileUpdate(transmissionFileInfo);
+                                    sunSize = 0l;
                                 }
                                 break;
                             }
+                        }
+                        // 如果中途暂停了
+                        if (sunSize > 0l && !isStart) {
+                            transmissionFileInfo.addSize(sunSize);
+                            client.sendFileUpdate(transmissionFileInfo);
                         }
                     }
                 } catch (IOException e) {
