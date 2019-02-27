@@ -44,6 +44,8 @@ public abstract class Client {
 
     public abstract void pauseSendFile();
 
+    public abstract void continumSendFileData();
+
     public TransmissionFileInfo getReceiveTransmissionFileInfo() {
         return receiveTransmissionFileInfo;
     }

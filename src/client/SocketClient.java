@@ -17,6 +17,8 @@ public class SocketClient extends Client {
     private SendFileCommandSocket sendFileInfoController;
     private SendFileSocketController sendFileSocketController;
     private Configuration config;
+    // 对方的端口号
+    private Integer sendFilePort;
 
     /**
      * Socket对象
@@ -94,7 +96,8 @@ public class SocketClient extends Client {
     public void replyIsAccept(Boolean accept, Integer sendFilePort) {
         config.getListener().onAcceptListener(accept);
         if (accept) {
-            startSendFile(sendFilePort);
+            this.sendFilePort = sendFilePort;
+            sendFileData();
         }
     }
 
@@ -115,10 +118,16 @@ public class SocketClient extends Client {
     /**
      * 开始发送文件
      */
-    private void startSendFile(Integer sendFilePort) {
-        if (sendFile != null && !sendFile.getFileHashValue().isEmpty()) {
+    private void sendFileData() {
+        if (sendFilePort != null && sendFile != null && !sendFile.getFileHashValue().isEmpty()) {
             sendFileSocketController = new SendFileSocketController(config, sendFile, getHostAddress(), sendFilePort);
             sendFileSocketController.start();
         }
+    }
+
+    @Override
+    public void continumSendFileData() {
+        if (sendFileSocketController != null)
+            sendFileSocketController.start();
     }
 }

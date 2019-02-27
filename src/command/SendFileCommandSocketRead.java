@@ -3,6 +3,7 @@ package command;
 import client.Client;
 import config.Configuration;
 import send.TransmissionFileInfo;
+import send.TransmissionSectionFileInfo;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -16,7 +17,7 @@ import java.net.Socket;
  * type为1则表示发送文件信息:                                                                                    1,Base64(文件名),文件大小,文件hash值
  * type为2则表示确认是否接收(第2位0表示拒绝，1表示接收。第3位表示发送文件的端口号，拒绝的就传0):                     2,1,2333
  * type为3则表示开始任务(发送端点击开始，则会发送3过来，我们在分析接受的情况返回4，接收端点击开始就直接发送4):        3,文件hash值
- * type为4则表示返回接收端自身接收情况:                                                                           4,startIndex|finishIndex|endIndex,...
+ * type为4则表示返回接收端自身接收情况:                                                                           4,文件hash值,startIndex-endIndex-finishIndex,startIndex-endIndex-finishIndex,...
  */
 public class SendFileCommandSocketRead implements Runnable{
 
@@ -95,7 +96,21 @@ public class SendFileCommandSocketRead implements Runnable{
                     break;
                     // 开始
                 case 4:
-
+                    if (split.length > 2) {
+                        String fileHash = split[1];
+                        TransmissionFileInfo transmissionFileInfo = config.getTransmissionFileInfoForSendClient(client);
+                        if (fileHash.equals(transmissionFileInfo.getFileHash())) {
+                            transmissionFileInfo.getSectionFileInfos().clear();
+                            for (int i = 2; i < split.length; i++) {
+                                String[] ss = split[i].split("-");
+                                if (ss.length == 3) {
+                                    TransmissionSectionFileInfo sectionFileInfo = new TransmissionSectionFileInfo(Long.parseLong(ss[0]), Long.parseLong(ss[1]), Long.parseLong(ss[2]));
+                                    transmissionFileInfo.getSectionFileInfos().add(sectionFileInfo);
+                                }
+                            }
+                            client.continumSendFileData();
+                        }
+                    }
                     break;
             }
         }

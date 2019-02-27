@@ -3,6 +3,7 @@ package command;
 import client.Client;
 import config.Configuration;
 import send.TransmissionFileInfo;
+import send.TransmissionSectionFileInfo;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -49,6 +50,46 @@ public class ReceiveFileCommandServerSocketWrite implements Runnable , AcceptCon
     }
 
     /**
+     * 开始继续传输文件的信息
+     * @param transmissionFileInfo
+     */
+    public void sendStartTransmissionFileInfo(TransmissionFileInfo transmissionFileInfo) {
+        if (config.isMainThread()) {
+            config.commandPool().execute(new Runnable() {
+                @Override
+                public void run() {
+                    runSendStartTransmissionFileInfo(transmissionFileInfo);
+                }
+            });
+        } else {
+            runSendStartTransmissionFileInfo(transmissionFileInfo);
+        }
+    }
+
+    private void runSendStartTransmissionFileInfo(TransmissionFileInfo transmissionFileInfo) {
+        try {
+            connection();
+            if (isConnection()) {
+//                commandDataOutputStream = new DataOutputStream(socket.getOutputStream());
+                StringBuilder sb = new StringBuilder("4," + transmissionFileInfo.getFileHash() + ",");
+                for (TransmissionSectionFileInfo sectionFileInfo : transmissionFileInfo.getSectionFileInfos()) {
+                    sb.append(sectionFileInfo.getStartIndex());
+                    sb.append("-");
+                    sb.append(sectionFileInfo.getEndIndex());
+                    sb.append("-");
+                    sb.append(sectionFileInfo.getFinishIndex());
+                    sb.append("-");
+                }
+                commandDataOutputStream.writeUTF(sb.toString());
+                commandDataOutputStream.flush();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            colse();
+        }
+    }
+
+    /**
      * 同意接收
      */
     @Override
@@ -74,7 +115,7 @@ public class ReceiveFileCommandServerSocketWrite implements Runnable , AcceptCon
                 Client client = config.getClient(socket.getInetAddress().getHostAddress());
                 if (client != null) {
                     config.addReceiveFileInfoOnClient(client, transmissionFileInfo);
-                    commandDataOutputStream = new DataOutputStream(socket.getOutputStream());
+//                    commandDataOutputStream = new DataOutputStream(socket.getOutputStream());
                     commandDataOutputStream.writeUTF("2,1," + config.sendFilePort().toString());
                     commandDataOutputStream.flush();
                 }
@@ -106,7 +147,7 @@ public class ReceiveFileCommandServerSocketWrite implements Runnable , AcceptCon
         try {
             connection();
             if (isConnection()) {
-                commandDataOutputStream = new DataOutputStream(socket.getOutputStream());
+//                commandDataOutputStream = new DataOutputStream(socket.getOutputStream());
                 commandDataOutputStream.writeUTF("2,0,0");
                 commandDataOutputStream.flush();
             }
