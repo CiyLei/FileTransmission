@@ -51,8 +51,8 @@ public class ReceiveFileCommandServerSocket extends ServerSocket {
                             // 当commandSocket连接上了socket，则针对这个socket开启两个线程，一个死循环读消息专门回复消息，一个主动发送消息
                             ReceiveFileCommandServerSocketWrite commandServerSocketWrite = new ReceiveFileCommandServerSocketWrite(socket, config);
                             config.commandPool().execute(commandServerSocketWrite);
-                            config.commandPool().execute(new ReceiveFileCommandServerSocketRead(socket, commandServerSocketWrite, config));
                             client.setCommandServerSocketWrite(commandServerSocketWrite);
+                            config.commandPool().execute(new ReceiveFileCommandServerSocketRead(socket, commandServerSocketWrite, config));
                         }
                     } catch (IOException e) {
                         e.printStackTrace();

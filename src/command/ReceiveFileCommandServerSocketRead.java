@@ -63,6 +63,9 @@ public class ReceiveFileCommandServerSocketRead implements Runnable {
                             Long fileSize = Long.parseLong(split[2]);
                             String fileHash = split[3];
                             TransmissionFileInfo currentTransmissionFileInfo = new TransmissionFileInfo(fileName, fileSize, fileHash);
+                            Client client = config.getClient(socket.getInetAddress().getHostAddress());
+                            if (client != null)
+                                client.setReceiveFile(currentTransmissionFileInfo);
                             if (config.getListener() != null)
                                 config.getListener().onFileInfoListener(currentTransmissionFileInfo, commandServerSocketWrite);
                         } catch (UnsupportedEncodingException e) {

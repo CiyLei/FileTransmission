@@ -16,6 +16,7 @@ import java.util.List;
 public abstract class Client {
 
     protected FileInfo sendFile;
+    private TransmissionFileInfo receiveFile;
     private String hostAddress;
     private String hostName;
     private Integer commandPort;
@@ -110,9 +111,17 @@ public abstract class Client {
     }
 
     public void startReceiveFile() {
-        if (getCommandServerSocketWrite() != null && sendTransmissionFileInfo != null) {
+        if (getCommandServerSocketWrite() != null && getReceiveFile() != null) {
             getCommandServerSocketWrite().sendStartTransmissionFileInfo(sendTransmissionFileInfo);
         }
+    }
+
+    public TransmissionFileInfo getReceiveFile() {
+        return receiveFile;
+    }
+
+    public void setReceiveFile(TransmissionFileInfo receiveFile) {
+        this.receiveFile = receiveFile;
     }
 
     public void pauseReceiveFile() {
