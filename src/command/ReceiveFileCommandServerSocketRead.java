@@ -73,7 +73,12 @@ public class ReceiveFileCommandServerSocketRead implements Runnable {
                 case 3:
                     if (split.length == 2) {
                         String fileHash = split[1];
-                        System.out.println("你想开始:" + fileHash);
+                        Client client = config.getClient(socket.getInetAddress().getHostAddress());
+                        TransmissionFileInfo transmissionFileInfo = config.getTransmissionFileInfoForReceiveClient(client);
+                        // 如果有为接收完毕的任务的话
+                        if (!transmissionFileInfo.getSectionFileInfos().isEmpty()) {
+                            System.out.println("你想开始:" + fileHash + " " + transmissionFileInfo.getSectionFileInfos());
+                        }
                     }
                     break;
             }
