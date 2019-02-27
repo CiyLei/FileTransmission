@@ -71,7 +71,10 @@ public class ReceiveFileCommandServerSocketRead implements Runnable {
                     }
                     break;
                 case 3:
-                    System.out.println("尔等想开始?");
+                    if (split.length == 2) {
+                        String fileHash = split[1];
+                        System.out.println("你想开始:" + fileHash);
+                    }
                     break;
             }
         }
