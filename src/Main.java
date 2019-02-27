@@ -52,7 +52,7 @@ public class Main {
                         Thread.sleep(2000);
 //                        File file = new File("C:\\Users\\LENOVO\\Desktop\\QQ_V6.5.2.dmg");
                         System.out.println("继续发送");
-                        client.pauseSendFile();
+                        client.startSendFile();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
