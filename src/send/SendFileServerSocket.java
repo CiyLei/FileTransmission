@@ -26,7 +26,7 @@ public class SendFileServerSocket extends ServerSocket {
                         Socket socket = accept();
                         Client client = config.getClient(socket.getInetAddress().getHostAddress());
                         if (client != null) {
-                            client.setReceive(false);
+                            client.setReceive(true);
                             config.sendFilePool().execute(new ReceiveFileSocketController(socket, config));
                         }
                     } catch (IOException e) {
