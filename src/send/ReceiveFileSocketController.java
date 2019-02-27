@@ -54,6 +54,9 @@ public class ReceiveFileSocketController implements Runnable{
                         ct = System.currentTimeMillis();
 //                        sunSize = 0l;
                     }
+                    if (!client.isReceive()){
+                        colse();
+                    }
                 }
                 sectionFileInfo.setFinishIndex(randomAccessFile.getFilePointer());
                 client.receiveFileUpdate(transmissionFileInfo);

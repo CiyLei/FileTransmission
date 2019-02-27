@@ -54,7 +54,7 @@ public class SocketClient extends Client {
     @Override
     public void pauseSendFile() {
         if (sendFileSocketController != null)
-            sendFileSocketController.stop();
+            isSead = false;
     }
 
     /**
@@ -119,6 +119,7 @@ public class SocketClient extends Client {
      * 开始发送文件
      */
     private void sendFileData() {
+        isSead = true;
         if (sendFilePort != null && sendFile != null && !sendFile.getFileHashValue().isEmpty()) {
             sendFileSocketController = new SendFileSocketController(config, sendFile, getHostAddress(), sendFilePort);
             sendFileSocketController.start();
@@ -127,6 +128,7 @@ public class SocketClient extends Client {
 
     @Override
     public void continumSendFileData() {
+        isSead = true;
         if (sendFileSocketController != null)
             sendFileSocketController.start();
     }

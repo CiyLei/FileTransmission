@@ -8,8 +8,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 
 public class SendFileSocketController {
@@ -17,7 +15,6 @@ public class SendFileSocketController {
     private FileInfo fileInfo;
     private String receiveAddress;
     private Integer receivePort;
-    private Boolean isStart;
 
     public SendFileSocketController(Configuration config, FileInfo fileInfo, String receiveAddress, Integer sendFilePort) {
         this.config = config;
@@ -27,7 +24,6 @@ public class SendFileSocketController {
     }
 
     public void start() {
-        isStart = true;
         Client client = config.getClient(receiveAddress);
         if (client != null) {
             TransmissionFileInfo transmissionFileInfo = config.getTransmissionFileInfoForSendClient(client);
@@ -54,10 +50,6 @@ public class SendFileSocketController {
                 }
             }
         }
-    }
-
-    public void stop() {
-        isStart = false;
     }
 
     public class SendFileTask implements Runnable{
@@ -118,7 +110,7 @@ public class SendFileSocketController {
                         // 保持一段时间再更新一下
                         Long ct = System.currentTimeMillis();
 //                        Long sunSize = 0l;
-                        while (isStart) {
+                        while (client.isSead()) {
                             if (randomAccessFile.getFilePointer() + buffer.length - 1 < transmissionFileInfo.getSectionFileInfos().get(sectionIndex).getEndIndex()) {
                                 if (randomAccessFile.read(buffer) != -1) {
                                     dataOutputStream.write(buffer);
@@ -145,7 +137,7 @@ public class SendFileSocketController {
                             }
                         }
                         // 如果中途暂停了
-                        if (!isStart) {
+                        if (!client.isSead()) {
                             transmissionFileInfo.getSectionFileInfos().get(sectionIndex).setFinishIndex(randomAccessFile.getFilePointer());
                             client.sendFileUpdate(transmissionFileInfo);
                         }

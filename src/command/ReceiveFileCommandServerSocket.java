@@ -52,6 +52,7 @@ public class ReceiveFileCommandServerSocket extends ServerSocket {
                             ReceiveFileCommandServerSocketWrite commandServerSocketWrite = new ReceiveFileCommandServerSocketWrite(socket, config);
                             config.commandPool().execute(commandServerSocketWrite);
                             config.commandPool().execute(new ReceiveFileCommandServerSocketRead(socket, commandServerSocketWrite, config));
+                            client.setCommandServerSocketWrite(commandServerSocketWrite);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();

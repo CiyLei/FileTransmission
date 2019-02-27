@@ -1,5 +1,6 @@
 package send;
 
+import client.Client;
 import config.Configuration;
 
 import java.io.IOException;
@@ -23,7 +24,9 @@ public class SendFileServerSocket extends ServerSocket {
                 while (true) {
                     try {
                         Socket socket = accept();
-                        if (config.getClient(socket.getInetAddress().getHostAddress()) != null) {
+                        Client client = config.getClient(socket.getInetAddress().getHostAddress());
+                        if (client != null) {
+                            client.setReceive(false);
                             config.sendFilePool().execute(new ReceiveFileSocketController(socket, config));
                         }
                     } catch (IOException e) {

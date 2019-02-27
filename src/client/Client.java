@@ -1,6 +1,9 @@
 package client;
 
+import command.ReceiveFileCommandServerSocket;
+import command.ReceiveFileCommandServerSocketWrite;
 import config.Configuration;
+import send.ReceiveFileSocketController;
 import send.TransmissionFileInfo;
 
 import java.io.File;
@@ -17,8 +20,12 @@ public abstract class Client {
     private String hostName;
     private Integer commandPort;
     private Boolean isConnection = false;
+    protected Boolean isSead = false;
+    protected Boolean isReceive = false;
     Configuration configuration;
     List<ClientListener> listeners;
+    // 主动发送开始
+    private ReceiveFileCommandServerSocketWrite commandServerSocketWrite;
     // 接收文件的信息
     protected TransmissionFileInfo receiveTransmissionFileInfo;
     // 发送文件的信息
@@ -80,6 +87,36 @@ public abstract class Client {
 
     public Boolean isConnection() {
         return isConnection;
+    }
+
+    public ReceiveFileCommandServerSocketWrite getCommandServerSocketWrite() {
+        return commandServerSocketWrite;
+    }
+
+    public void setCommandServerSocketWrite(ReceiveFileCommandServerSocketWrite commandServerSocketWrite) {
+        this.commandServerSocketWrite = commandServerSocketWrite;
+    }
+
+    public Boolean isSead() {
+        return isSead;
+    }
+
+    public Boolean isReceive() {
+        return isReceive;
+    }
+
+    public void setReceive(Boolean receive) {
+        isReceive = receive;
+    }
+
+    public void startReceiveFile() {
+        if (getCommandServerSocketWrite() != null && sendTransmissionFileInfo != null) {
+            getCommandServerSocketWrite().sendStartTransmissionFileInfo(sendTransmissionFileInfo);
+        }
+    }
+
+    public void pauseReceiveFile() {
+        isReceive = false;
     }
 
     public abstract void connection();
