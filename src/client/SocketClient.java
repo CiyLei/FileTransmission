@@ -45,7 +45,7 @@ public class SocketClient extends Client {
         config.commandPool().execute(new Runnable() {
             @Override
             public void run() {
-                if (sendFileInfoController != null)
+                if (sendFileInfoController != null && sendFile != null && sendFile.getFileHashValue() != null)
                     sendFileInfoController.sendStartMessage(sendFile.getFileHashValue());
             }
         });
