@@ -1,71 +1,45 @@
-import scan.Scan;
-import client.Client;
-import send.TransmissionFileInfo;
+import com.dj.transmission.FileTransmission;
+import com.dj.transmission.OnClienListener;
+import com.dj.transmission.client.command.OnConnectionListener;
+import com.dj.transmission.client.TransmissionClient;
+import com.dj.transmission.client.command.receive.AcceptController;
+import com.dj.transmission.client.command.send.OnSendClientListener;
+import com.dj.transmission.file.TransmissionFileInfo;
 
 import java.io.File;
-import java.io.IOException;
 
 public class Main {
 
     public static void main(String[] args) {
         try {
-            Scan scan = new FileTransmission().getBroadcastScan();
-            scan.addListener(new Scan.ScanListener() {
+            FileTransmission transmission = new FileTransmission();
+            transmission.addOnClienListeners(new OnClienListener() {
                 @Override
-                public void onGet(final Client client) {
-                    // getInetAddress().getHostAddress()是个阻塞方法，慎用
-//                    System.out.println("扫描到客户端：" + client.getInetAddress().getHostName() + "-" + client.getInetAddress().getHostAddress());
-                    System.out.println("扫描到客户端：" + client.getHostName() + " ip:" + client.getHostAddress() + " commandPort:" + client.getCommandPort());
-                    client.addListener(new Client.ClientListener() {
-                        @Override
-                        public void onConnection(Boolean connection) {
-                            System.out.println("command连接" + (connection ? "成功" : "失败") + " " + client.getHostName() + " ip:" + client.getHostAddress() + " commandPort:" + client.getCommandPort());
-                        }
-
-                        @Override
-                        public void onReceiveFileUpdate() {
-                            System.out.println("接收文件:" + client.getReceiveTransmissionFileInfo().getFileName() + " 进度:" + client.getReceiveTransmissionFileInfo().getProgress());
-                        }
-
-                        @Override
-                        public void onSendFileUpdate() {
-                            System.out.println("发送文件:" + client.getSendTransmissionFileInfo().getFileName() + " 进度:" + client.getSendTransmissionFileInfo().getProgress());
-                        }
-                    });
-                    try {
-                        Thread.sleep(1000);
-                        File file = new File("C:\\Users\\LENOVO\\Desktop\\QQ_V6.5.2.dmg");
-                        System.out.println("开始发送文件信息 name：" + file.getName() + " size:" + file.length());
-                        client.sendFile(file);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        Thread.sleep(2000);
-//                        File file = new File("C:\\Users\\LENOVO\\Desktop\\QQ_V6.5.2.dmg");
-                        System.out.println("暂停发送");
-                        client.pauseSendFile();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        Thread.sleep(2000);
-//                        File file = new File("C:\\Users\\LENOVO\\Desktop\\QQ_V6.5.2.dmg");
-                        System.out.println("继续发送");
-                        client.startSendFile();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onFinish() {
-                    System.out.println("扫描完毕");
+                public void onReceiveFileInfo(TransmissionClient client, TransmissionFileInfo fileInfo, AcceptController controller) {
+                    System.out.println(System.currentTimeMillis() + " 对方 ip:" + client.getHostAddress() + " port:" + client.getCommandPort() + " 发来了文件信息 fileName:" + fileInfo.getFileName() + " fileSize:" + fileInfo.getFileSize() + " fileHash:" + fileInfo.getFileHash());
+//                    controller.reject();
+                    controller.accept();
                 }
             });
-            scan.startScan();
-        } catch (IOException e) {
+            TransmissionClient client = transmission.createOrGetClient("127.0.0.1", 10098);
+            client.addOnConnectionListener(new OnConnectionListener() {
+                @Override
+                public void onConnection(Boolean connection, Boolean isSend) {
+                    System.out.println(System.currentTimeMillis() + " 我Main作为" + (isSend ? "发送端" : "接收端") + "连接" + (connection ? "成功" : "失败"));
+                }
+            });
+            client.addOnSendClientListener(new OnSendClientListener() {
+                @Override
+                public void onAccept(Boolean accept) {
+                    System.out.println(System.currentTimeMillis() + "人家" + (accept ? "同意" : "拒绝") + "了");
+                }
+            });
+            client.sendFile(new File("D:\\360极速浏览器下载\\jdk-8u181-windows-x64.exe"));
+//            Thread.sleep(100);
+//            client.pauseSend();
+        } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("Main初始化失败");
         }
     }
 }

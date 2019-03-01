@@ -4,7 +4,7 @@ import command.SendFileCommandSocket;
 import config.Configuration;
 import send.SendFileSocketController;
 import send.TransmissionFileInfo;
-import utils.MD5Util;
+import com.dj.transmission.utils.MD5Util;
 
 import java.io.File;
 
