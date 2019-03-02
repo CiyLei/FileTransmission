@@ -1,6 +1,6 @@
 package com.dj.transmission.client.command.send;
 
-import com.dj.transmission.FileTransmission;
+import com.dj.transmission.client.TransmissionClient;
 import com.dj.transmission.file.TransmissionFileInfo;
 
 import java.io.DataOutputStream;
@@ -11,12 +11,12 @@ import java.net.Socket;
  * 发送端专门发送命令用的Socket管理
  */
 public class SendCommandSocketWrite {
+    private TransmissionClient client;
     private Socket socket;
     private DataOutputStream stream;
-    private FileTransmission transmission;
 
-    public SendCommandSocketWrite(FileTransmission transmission, Socket socket) {
-        this.transmission = transmission;
+    public SendCommandSocketWrite(TransmissionClient client, Socket socket) {
+        this.client = client;
         this.socket = socket;
     }
 
@@ -30,7 +30,7 @@ public class SendCommandSocketWrite {
                 stream = new DataOutputStream(socket.getOutputStream());
             }
         } catch (IOException e) {
-            if (transmission.getConfig().isDebug())
+            if (client.getFileTransmission().getConfig().isDebug())
                 e.printStackTrace();
             close();
         }
@@ -41,17 +41,17 @@ public class SendCommandSocketWrite {
         if (isConnection() && stream != null) {
             try {
                 StringBuffer sb = new StringBuffer("1,");
-                sb.append(transmission.encodeString(fileInfo.getFileName()));
+                sb.append(client.getFileTransmission().encodeString(fileInfo.getFileName()));
                 sb.append(",");
                 sb.append(fileInfo.getFileSize());
                 sb.append(",");
                 sb.append(fileInfo.getFileHash());
                 sb.append(",");
-                sb.append(transmission.getConfig().commandPort());
+                sb.append(client.getFileTransmission().getConfig().commandPort());
                 stream.writeUTF(sb.toString());
                 stream.flush();
             } catch (IOException e) {
-                if (transmission.getConfig().isDebug())
+                if (client.getFileTransmission().getConfig().isDebug())
                     e.printStackTrace();
                 close();
             }
@@ -64,7 +64,7 @@ public class SendCommandSocketWrite {
                 stream.close();
             stream = null;
         } catch (IOException e) {
-            if (transmission.getConfig().isDebug())
+            if (client.getFileTransmission().getConfig().isDebug())
                 e.printStackTrace();
         }
     }

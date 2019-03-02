@@ -1,18 +1,18 @@
 package com.dj.transmission.client.command.receive;
 
-import com.dj.transmission.FileTransmission;
+import com.dj.transmission.client.TransmissionClient;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
 public class ReceiveCommandSocketWrite {
-    private FileTransmission transmission;
+    private TransmissionClient client;
     private Socket socket;
     private DataOutputStream stream;
 
-    public ReceiveCommandSocketWrite(FileTransmission transmission, Socket socket) {
-        this.transmission = transmission;
+    public ReceiveCommandSocketWrite(TransmissionClient client, Socket socket) {
+        this.client = client;
         this.socket = socket;
     }
 
@@ -26,7 +26,7 @@ public class ReceiveCommandSocketWrite {
                 stream = new DataOutputStream(socket.getOutputStream());
             }
         } catch (IOException e) {
-            if (transmission.getConfig().isDebug())
+            if (client.getFileTransmission().getConfig().isDebug())
                 e.printStackTrace();
             close();
         }
@@ -39,11 +39,11 @@ public class ReceiveCommandSocketWrite {
                 StringBuffer sb = new StringBuffer("2,");
                 sb.append(isAccept ? "1" : "0");
                 sb.append(",");
-                sb.append(transmission.getConfig().sendFilePort());
+                sb.append(client.getFileTransmission().getConfig().sendFilePort());
                 stream.writeUTF(sb.toString());
                 stream.flush();
             } catch (IOException e) {
-                if (transmission.getConfig().isDebug())
+                if (client.getFileTransmission().getConfig().isDebug())
                     e.printStackTrace();
                 close();
             }
@@ -56,7 +56,7 @@ public class ReceiveCommandSocketWrite {
                 stream.close();
             stream = null;
         } catch (IOException e) {
-            if (transmission.getConfig().isDebug())
+            if (client.getFileTransmission().getConfig().isDebug())
                 e.printStackTrace();
         }
     }

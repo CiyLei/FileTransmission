@@ -32,7 +32,7 @@ public class TransmissionClient implements SendCommandClientDelegate, ReceiveCom
         this.hostAddress = hostAddress;
         if (commandPort != null) {
             this.commandPort = commandPort;
-            this.sendCommandClientDelegate = new SendCommandClientDelegateImp(transmission, hostAddress, commandPort, onConnectionListeners, handle);
+            this.sendCommandClientDelegate = new SendCommandClientDelegateImp(this, hostAddress, commandPort, onConnectionListeners, handle);
         }
     }
 
@@ -43,7 +43,7 @@ public class TransmissionClient implements SendCommandClientDelegate, ReceiveCom
     private CommandClientHandle handle = new CommandClientHandle() {
         @Override
         public void handleCommandStart(Integer sendFilePort) {
-            sendFileDataController = new SendFileDataController(transmission, hostAddress, sendFilePort, getSendFileInfo());
+            sendFileDataController = new SendFileDataController(TransmissionClient.this, hostAddress, sendFilePort, getSendFileInfo());
             sendFileDataController.start();
         }
 
@@ -175,12 +175,16 @@ public class TransmissionClient implements SendCommandClientDelegate, ReceiveCom
         }
     }
 
+    public FileTransmission getFileTransmission() {
+        return transmission;
+    }
+
     /**
      * 设置接收命令的socket
      * @param socket
      */
     public void setReceiveCommandSocket(Socket socket) {
-        receiveCommandClientDelegate = new ReceiveCommandClientDelegateImp(transmission, socket, this, onConnectionListeners, handle);
+        receiveCommandClientDelegate = new ReceiveCommandClientDelegateImp(this, socket, onConnectionListeners, handle);
     }
 
     /**
@@ -190,7 +194,7 @@ public class TransmissionClient implements SendCommandClientDelegate, ReceiveCom
     public void addReceiveFileDataController(Socket socket) {
         if (getReceiveFileInfo() != null) {
             // 开始接收文件信息
-            ReceiveFileDataController receiveFileDataController = new ReceiveFileDataController(transmission, socket, getReceiveFileInfo());
+            ReceiveFileDataController receiveFileDataController = new ReceiveFileDataController(this, socket, getReceiveFileInfo());
             receiveFileDataController.start();
             receiveFileDataControllers.add(receiveFileDataController);
         }
@@ -211,7 +215,7 @@ public class TransmissionClient implements SendCommandClientDelegate, ReceiveCom
     public void setCommandPort(Integer commandPort) {
         if (commandPort != null) {
             this.commandPort = commandPort;
-            this.sendCommandClientDelegate = new SendCommandClientDelegateImp(transmission, hostAddress, commandPort, onConnectionListeners, handle);
+            this.sendCommandClientDelegate = new SendCommandClientDelegateImp(this, hostAddress, commandPort, onConnectionListeners, handle);
         }
     }
 }

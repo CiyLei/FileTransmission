@@ -1,6 +1,6 @@
 package com.dj.transmission.client.command.send;
 
-import com.dj.transmission.FileTransmission;
+import com.dj.transmission.client.TransmissionClient;
 import com.dj.transmission.client.command.OnConnectionListener;
 import com.dj.transmission.client.command.CommandClientHandle;
 import com.dj.transmission.file.TransmissionFileInfo;
@@ -18,7 +18,7 @@ public class SendCommandClientDelegateImp implements SendCommandClientDelegate, 
 
     private String hostAddress;
     private Integer commandPort;
-    private FileTransmission transmission;
+    private TransmissionClient client;
     private List<OnSendClientListener> onSendClientListeners = new ArrayList<>();
     private List<OnConnectionListener> onConnectionListeners;
     private Socket socket;
@@ -27,8 +27,8 @@ public class SendCommandClientDelegateImp implements SendCommandClientDelegate, 
     private TransmissionFileInfo sendFileInfo;
     private CommandClientHandle handle;
 
-    public SendCommandClientDelegateImp(FileTransmission transmission, String hostAddress, Integer commandPort, List<OnConnectionListener> onConnectionListeners, CommandClientHandle handle) {
-        this.transmission = transmission;
+    public SendCommandClientDelegateImp(TransmissionClient client, String hostAddress, Integer commandPort, List<OnConnectionListener> onConnectionListeners, CommandClientHandle handle) {
+        this.client = client;
         this.hostAddress = hostAddress;
         this.commandPort = commandPort;
         this.onConnectionListeners = onConnectionListeners;
@@ -40,16 +40,16 @@ public class SendCommandClientDelegateImp implements SendCommandClientDelegate, 
         if (socket == null || socket.isClosed()) {
             try {
                 socket = new Socket(hostAddress, commandPort);
-                socketWrite = new SendCommandSocketWrite(transmission, socket);
-                socketRead = new SendCommandSocketRead(transmission, socket, this);
+                socketWrite = new SendCommandSocketWrite(client, socket);
+                socketRead = new SendCommandSocketRead(client, socket, this);
             } catch (IOException e) {
-                if (transmission.getConfig().isDebug())
+                if (client.getFileTransmission().getConfig().isDebug())
                     e.printStackTrace();
                 close();
                 return;
             }
         }
-        transmission.getScheduler().run(new Runnable() {
+        client.getFileTransmission().getScheduler().run(new Runnable() {
             @Override
             public void run() {
                 for (OnConnectionListener listener  : onConnectionListeners)
@@ -110,7 +110,7 @@ public class SendCommandClientDelegateImp implements SendCommandClientDelegate, 
             sendFileInfo = new TransmissionFileInfo(file, hash);
             socketWrite.sendFileInfoMessage(sendFileInfo);
         } catch (FileNotFoundException e) {
-            if (transmission.getConfig().isDebug())
+            if (client.getFileTransmission().getConfig().isDebug())
                 e.printStackTrace();
         }
     }
@@ -121,10 +121,10 @@ public class SendCommandClientDelegateImp implements SendCommandClientDelegate, 
             if (socket != null)
                 socket.close();
         } catch (IOException e) {
-            if (transmission.getConfig().isDebug())
+            if (client.getFileTransmission().getConfig().isDebug())
                 e.printStackTrace();
         }
-        transmission.getScheduler().run(new Runnable() {
+        client.getFileTransmission().getScheduler().run(new Runnable() {
             @Override
             public void run() {
                 for (OnConnectionListener listener  : onConnectionListeners)
@@ -138,18 +138,18 @@ public class SendCommandClientDelegateImp implements SendCommandClientDelegate, 
         // 同意了的话，马上分割文件
         if (accept) {
             sendFileInfo.getSectionInfos().clear();
-            Long average = sendFileInfo.getFileSize() / transmission.getConfig().sendFileTaskThreadCount();
-            for (int i = 0; i < transmission.getConfig().sendFileTaskThreadCount(); i++) {
+            Long average = sendFileInfo.getFileSize() / client.getFileTransmission().getConfig().sendFileTaskThreadCount();
+            for (int i = 0; i < client.getFileTransmission().getConfig().sendFileTaskThreadCount(); i++) {
                 Long endIndex = (i + 1) * average - 1;
                 // 最后一个全包了
-                if (i == transmission.getConfig().sendFileTaskThreadCount() - 1)
+                if (i == client.getFileTransmission().getConfig().sendFileTaskThreadCount() - 1)
                     endIndex = sendFileInfo.getFileSize() - 1;
                 TransmissionFileSectionInfo sectionFileInfo = new TransmissionFileSectionInfo(i * average, endIndex, i * average);
                 sendFileInfo.getSectionInfos().add(sectionFileInfo);
             }
         }
         // 进行回调
-        transmission.getScheduler().run(new Runnable() {
+        client.getFileTransmission().getScheduler().run(new Runnable() {
             @Override
             public void run() {
                 for (OnSendClientListener onSendClientListener : onSendClientListeners) {

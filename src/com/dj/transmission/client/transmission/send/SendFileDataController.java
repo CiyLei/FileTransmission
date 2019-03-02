@@ -1,6 +1,6 @@
 package com.dj.transmission.client.transmission.send;
 
-import com.dj.transmission.FileTransmission;
+import com.dj.transmission.client.TransmissionClient;
 import com.dj.transmission.file.TransmissionFileInfo;
 
 import java.io.DataOutputStream;
@@ -9,14 +9,14 @@ import java.io.RandomAccessFile;
 import java.net.Socket;
 
 public class SendFileDataController {
-    private FileTransmission transmission;
+    private TransmissionClient client;
     private String hostAddress;
     private Integer port;
     private TransmissionFileInfo sendFileInfo;
     private Boolean isStart;
 
-    public SendFileDataController(FileTransmission transmission, String hostAddress, Integer port, TransmissionFileInfo sendFileInfo) {
-        this.transmission = transmission;
+    public SendFileDataController(TransmissionClient client, String hostAddress, Integer port, TransmissionFileInfo sendFileInfo) {
+        this.client = client;
         this.hostAddress = hostAddress;
         this.port = port;
         this.sendFileInfo = sendFileInfo;
@@ -26,7 +26,7 @@ public class SendFileDataController {
     public void start() {
         isStart = true;
         for (int i = 0; i < sendFileInfo.getSectionInfos().size(); i++) {
-            transmission.sendFilePool().execute(new SendFileTask(sendFileInfo, i, hostAddress, port));
+            client.getFileTransmission().sendFilePool().execute(new SendFileTask(sendFileInfo, i, hostAddress, port));
         }
     }
 
@@ -94,7 +94,7 @@ public class SendFileDataController {
                             if (randomAccessFile.read(buffer) != -1) {
                                 dataOutputStream.write(buffer);
 
-                                if (System.currentTimeMillis() - ct >= transmission.getConfig().sendFileUpdateFrequency()) {
+                                if (System.currentTimeMillis() - ct >= client.getFileTransmission().getConfig().sendFileUpdateFrequency()) {
                                     fileInfo.getSectionInfos().get(sectionIndex).setFinishIndex(randomAccessFile.getFilePointer());
                                     ct = System.currentTimeMillis();
                                     // TODO 发送进度回调
@@ -121,7 +121,7 @@ public class SendFileDataController {
                     }
 
                 } catch (IOException e) {
-                    if (transmission.getConfig().isDebug())
+                    if (client.getFileTransmission().getConfig().isDebug())
                         e.printStackTrace();
                 } finally {
                     colse();
@@ -138,7 +138,7 @@ public class SendFileDataController {
                 if (socket != null)
                     socket.close();
             } catch (IOException e1) {
-                if (transmission.getConfig().isDebug())
+                if (client.getFileTransmission().getConfig().isDebug())
                     e1.printStackTrace();
             }
             randomAccessFile = null;

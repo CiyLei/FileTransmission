@@ -1,6 +1,6 @@
 package com.dj.transmission.client.transmission.receive;
 
-import com.dj.transmission.FileTransmission;
+import com.dj.transmission.client.TransmissionClient;
 import com.dj.transmission.file.TransmissionFileInfo;
 import com.dj.transmission.file.TransmissionFileSectionInfo;
 
@@ -11,15 +11,15 @@ import java.io.RandomAccessFile;
 import java.net.Socket;
 
 public class ReceiveFileDataController {
-    private FileTransmission transmission;
+    private TransmissionClient client;
     private Socket socket;
     private TransmissionFileInfo reveiceFileInfo;
     private DataInputStream dataInputStream;
     private RandomAccessFile randomAccessFile;
     private Boolean isStart;
 
-    public ReceiveFileDataController(FileTransmission transmission, Socket socket, TransmissionFileInfo reveiceFileInfo) {
-        this.transmission = transmission;
+    public ReceiveFileDataController(TransmissionClient client, Socket socket, TransmissionFileInfo reveiceFileInfo) {
+        this.client = client;
         this.socket = socket;
         this.reveiceFileInfo = reveiceFileInfo;
         this.isStart = false;
@@ -37,7 +37,7 @@ public class ReceiveFileDataController {
                 Long finishIndex = dataInputStream.readLong();
                 TransmissionFileSectionInfo sectionInfo = new TransmissionFileSectionInfo(startIndex, endIndex, finishIndex);
                 reveiceFileInfo.getSectionInfos().add(sectionInfo);
-                String saveFilePath = createSaveFilePath(transmission.getConfig().saveFilePath());
+                String saveFilePath = createSaveFilePath(client.getFileTransmission().getConfig().saveFilePath());
                 randomAccessFile = new RandomAccessFile(saveFilePath + reveiceFileInfo.getFileName(), "rwd");
                 randomAccessFile.seek(finishIndex);
                 byte[] buffer = new byte[1024 * 4];
@@ -46,7 +46,7 @@ public class ReceiveFileDataController {
                 Long ct = System.currentTimeMillis();
                 while((len = socket.getInputStream().read(buffer)) != -1){
                     randomAccessFile.write(buffer, 0, len);
-                    if (System.currentTimeMillis() - ct >= transmission.getConfig().sendFileUpdateFrequency()) {
+                    if (System.currentTimeMillis() - ct >= client.getFileTransmission().getConfig().sendFileUpdateFrequency()) {
                         sectionInfo.setFinishIndex(randomAccessFile.getFilePointer());
                         ct = System.currentTimeMillis();
                         // TODO 接收文件回调
@@ -63,7 +63,7 @@ public class ReceiveFileDataController {
                 socketClose();
             }
         } catch (IOException e) {
-            if (transmission.getConfig().isDebug())
+            if (client.getFileTransmission().getConfig().isDebug())
                 e.printStackTrace();
         } finally {
             socketClose();
@@ -91,7 +91,7 @@ public class ReceiveFileDataController {
             if (socket != null)
                 socket.close();
         } catch (IOException e1) {
-            if (transmission.getConfig().isDebug())
+            if (client.getFileTransmission().getConfig().isDebug())
                 e1.printStackTrace();
         }
         randomAccessFile = null;

@@ -1,6 +1,5 @@
 package com.dj.transmission.client.command.receive;
 
-import com.dj.transmission.FileTransmission;
 import com.dj.transmission.OnClienListener;
 import com.dj.transmission.client.command.OnConnectionListener;
 import com.dj.transmission.client.TransmissionClient;
@@ -14,7 +13,6 @@ import java.util.List;
 public class ReceiveCommandClientDelegateImp implements ReceiveCommandClientDelegate, ReceiveCommandClientHandle, AcceptController {
 
     private Socket socket;
-    private FileTransmission transmission;
     private TransmissionClient client;
     private TransmissionFileInfo receiveFileInfo;
     private ReceiveCommandSocketRead socketRead;
@@ -22,10 +20,9 @@ public class ReceiveCommandClientDelegateImp implements ReceiveCommandClientDele
     private List<OnConnectionListener> onConnectionListeners;
     private CommandClientHandle handle;
 
-    public ReceiveCommandClientDelegateImp(FileTransmission transmission, Socket socket, TransmissionClient client, List<OnConnectionListener> onConnectionListeners, CommandClientHandle handle) {
-        this.transmission = transmission;
-        this.socket = socket;
+    public ReceiveCommandClientDelegateImp(TransmissionClient client, Socket socket, List<OnConnectionListener> onConnectionListeners, CommandClientHandle handle) {
         this.client = client;
+        this.socket = socket;
         this.onConnectionListeners = onConnectionListeners;
         this.handle = handle;
         connection();
@@ -33,9 +30,9 @@ public class ReceiveCommandClientDelegateImp implements ReceiveCommandClientDele
 
     private void connection() {
         if (socket != null && socket.isConnected()) {
-            socketRead = new ReceiveCommandSocketRead(transmission, socket, this);
-            socketWrite = new ReceiveCommandSocketWrite(transmission, socket);
-            transmission.getScheduler().run(new Runnable() {
+            socketRead = new ReceiveCommandSocketRead(client, socket, this);
+            socketWrite = new ReceiveCommandSocketWrite(client, socket);
+            client.getFileTransmission().getScheduler().run(new Runnable() {
                 @Override
                 public void run() {
                     for (OnConnectionListener listener  : onConnectionListeners)
@@ -74,11 +71,11 @@ public class ReceiveCommandClientDelegateImp implements ReceiveCommandClientDele
             try {
                 socket.close();
             } catch (IOException e) {
-                if (transmission.getConfig().isDebug())
+                if (client.getFileTransmission().getConfig().isDebug())
                     e.printStackTrace();
             }
         }
-        transmission.getScheduler().run(new Runnable() {
+        client.getFileTransmission().getScheduler().run(new Runnable() {
             @Override
             public void run() {
                 for (OnConnectionListener listener  : onConnectionListeners)
@@ -91,10 +88,10 @@ public class ReceiveCommandClientDelegateImp implements ReceiveCommandClientDele
     public void handleFileInfoCommand(String fileName, Long fileSize, String fileHash, Integer commandPort) {
         receiveFileInfo = new TransmissionFileInfo(fileName, fileSize, fileHash);
         client.setCommandPort(commandPort);
-        transmission.getScheduler().run(new Runnable() {
+        client.getFileTransmission().getScheduler().run(new Runnable() {
             @Override
             public void run() {
-                for (OnClienListener onClienListener : transmission.getOnClienListeners()) {
+                for (OnClienListener onClienListener : client.getFileTransmission().getOnClienListeners()) {
                     onClienListener.onReceiveFileInfo(client, receiveFileInfo, ReceiveCommandClientDelegateImp.this);
                 }
             }
@@ -108,8 +105,8 @@ public class ReceiveCommandClientDelegateImp implements ReceiveCommandClientDele
 
     @Override
     public void accept() {
-        if (transmission.isMainThread()) {
-            transmission.commandPool().execute(new Runnable() {
+        if (client.getFileTransmission().isMainThread()) {
+            client.getFileTransmission().commandPool().execute(new Runnable() {
                 @Override
                 public void run() {
                     if (socketWrite != null)
@@ -125,8 +122,8 @@ public class ReceiveCommandClientDelegateImp implements ReceiveCommandClientDele
     @Override
     public void reject() {
         receiveFileInfo = null;
-        if (transmission.isMainThread()) {
-            transmission.commandPool().execute(new Runnable() {
+        if (client.getFileTransmission().isMainThread()) {
+            client.getFileTransmission().commandPool().execute(new Runnable() {
                 @Override
                 public void run() {
                     if (socketWrite != null)

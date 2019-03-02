@@ -1,6 +1,6 @@
 package com.dj.transmission.client.command.receive;
 
-import com.dj.transmission.FileTransmission;
+import com.dj.transmission.client.TransmissionClient;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -18,13 +18,13 @@ import java.net.Socket;
  */
 public class ReceiveCommandSocketRead {
 
-    private FileTransmission transmission;
+    private TransmissionClient client;
     private Socket socket;
     private DataInputStream stream;
     private ReceiveCommandClientHandle handle;
 
-    public ReceiveCommandSocketRead(FileTransmission transmission, Socket socket, ReceiveCommandClientHandle handle) {
-        this.transmission = transmission;
+    public ReceiveCommandSocketRead(TransmissionClient client, Socket socket, ReceiveCommandClientHandle handle) {
+        this.client = client;
         this.socket = socket;
         this.handle = handle;
         run();
@@ -33,7 +33,7 @@ public class ReceiveCommandSocketRead {
     private void run() {
         connection();
         if (isConnection() && stream != null) {
-            transmission.commandPool().execute(new Runnable() {
+            client.getFileTransmission().commandPool().execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -42,7 +42,7 @@ public class ReceiveCommandSocketRead {
                             analysisReplyMsg(result);
                         }
                     } catch (IOException e) {
-                        if (transmission.getConfig().isDebug())
+                        if (client.getFileTransmission().getConfig().isDebug())
                             e.printStackTrace();
                         close();
                     }
@@ -59,7 +59,7 @@ public class ReceiveCommandSocketRead {
                 // 回复了是否接收文件的信息，这里分析进行回调
                 case 1:
                     if (split.length == 5) {
-                        String fileName = transmission.decodeString(split[1]);
+                        String fileName = client.getFileTransmission().decodeString(split[1]);
                         Long fileSize = Long.parseLong(split[2]);
                         String fileHash = split[3];
                         Integer commandPort = Integer.parseInt(split[4]);
@@ -84,7 +84,7 @@ public class ReceiveCommandSocketRead {
                 stream = new DataInputStream(socket.getInputStream());
             }
         } catch (IOException e) {
-            if (transmission.getConfig().isDebug())
+            if (client.getFileTransmission().getConfig().isDebug())
                 e.printStackTrace();
             close();
         }
@@ -96,7 +96,7 @@ public class ReceiveCommandSocketRead {
                 stream.close();
             stream = null;
         } catch (IOException e) {
-            if (transmission.getConfig().isDebug())
+            if (client.getFileTransmission().getConfig().isDebug())
                 e.printStackTrace();
         }
         handle.streamClose();

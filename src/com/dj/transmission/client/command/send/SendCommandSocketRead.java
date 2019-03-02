@@ -1,6 +1,6 @@
 package com.dj.transmission.client.command.send;
 
-import com.dj.transmission.FileTransmission;
+import com.dj.transmission.client.TransmissionClient;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -17,13 +17,13 @@ import java.net.Socket;
  * type为4则表示返回接收端自身接收情况:                                                                           4,文件hash值,startIndex-endIndex-finishIndex,startIndex-endIndex-finishIndex,...
  */
 public class SendCommandSocketRead {
-    private FileTransmission transmission;
+    private TransmissionClient client;
     private Socket socket;
     private SendCommandClientHandle handle;
     private DataInputStream stream;
 
-    public SendCommandSocketRead(FileTransmission transmission, Socket socket, SendCommandClientHandle handle) {
-        this.transmission = transmission;
+    public SendCommandSocketRead(TransmissionClient client, Socket socket, SendCommandClientHandle handle) {
+        this.client = client;
         this.socket = socket;
         this.handle = handle;
         run();
@@ -32,7 +32,7 @@ public class SendCommandSocketRead {
     private void run() {
         connection();
         if (isConnection() && stream != null) {
-            transmission.commandPool().execute(new Runnable() {
+            client.getFileTransmission().commandPool().execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -41,7 +41,7 @@ public class SendCommandSocketRead {
                             analysisReplyMsg(result);
                         }
                     } catch (IOException e) {
-                        if (transmission.getConfig().isDebug())
+                        if (client.getFileTransmission().getConfig().isDebug())
                             e.printStackTrace();
                         close();
                     }
@@ -81,7 +81,7 @@ public class SendCommandSocketRead {
                 stream = new DataInputStream(socket.getInputStream());
             }
         } catch (IOException e) {
-            if (transmission.getConfig().isDebug())
+            if (client.getFileTransmission().getConfig().isDebug())
                 e.printStackTrace();
             close();
         }
@@ -93,7 +93,7 @@ public class SendCommandSocketRead {
                 stream.close();
             stream = null;
         } catch (IOException e) {
-            if (transmission.getConfig().isDebug())
+            if (client.getFileTransmission().getConfig().isDebug())
                 e.printStackTrace();
         }
         handle.streamClose();
