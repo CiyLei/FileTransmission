@@ -3,7 +3,9 @@ import com.dj.transmission.OnClienListener;
 import com.dj.transmission.client.command.OnConnectionListener;
 import com.dj.transmission.client.TransmissionClient;
 import com.dj.transmission.client.command.receive.AcceptController;
+import com.dj.transmission.client.command.receive.OnReceiveClientListener;
 import com.dj.transmission.client.command.send.OnSendClientListener;
+import com.dj.transmission.client.transmission.TransmissionState;
 import com.dj.transmission.file.TransmissionFileInfo;
 
 import java.io.File;
@@ -31,12 +33,32 @@ public class Main {
             client.addOnSendClientListener(new OnSendClientListener() {
                 @Override
                 public void onAccept(Boolean accept) {
-                    System.out.println(System.currentTimeMillis() + "人家" + (accept ? "同意" : "拒绝") + "了");
+                    System.out.println(System.currentTimeMillis() + " 人家" + (accept ? "同意" : "拒绝") + "了");
+                }
+
+                @Override
+                public void onProgress(double progress) {
+                    System.out.println(client.getSendFileInfo().getFileName() + " 发送进度：" + progress);
+                }
+
+                @Override
+                public void onStateChange(TransmissionState state) {
+                    System.out.println((state == TransmissionState.START ? "开始" : "暂停") + "发送");
                 }
             });
-            client.sendFile(new File("D:\\360极速浏览器下载\\jdk-8u181-windows-x64.exe"));
-//            Thread.sleep(100);
-//            client.pauseSend();
+            client.addOnReceiveClientListeners(new OnReceiveClientListener() {
+                @Override
+                public void onProgress(double progress) {
+                    System.out.println(client.getReceiveFileInfo().getFileName() + " 接收进度：" + progress);
+                }
+            });
+            client.sendFile(new File("F:\\陈雷\\软件安装包\\DeskScapes8_setup.exe"));
+            Thread.sleep(1000);
+            /**
+             * 为什么暂停了之后过了一会onProgress会回调呢？
+             * 你看 你在config里面是不是设置了sendFileUpdateFrequency更新频率，所以onProgress并不是实时的，暂停了之后，后续也会继续将真实的数值回调回来
+             */
+            client.pauseSend();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Main初始化失败");

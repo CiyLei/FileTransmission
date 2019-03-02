@@ -3,7 +3,9 @@ package com.dj.transmission;
 import com.dj.transmission.client.command.OnConnectionListener;
 import com.dj.transmission.client.TransmissionClient;
 import com.dj.transmission.client.command.receive.AcceptController;
+import com.dj.transmission.client.command.receive.OnReceiveClientListener;
 import com.dj.transmission.client.command.send.OnSendClientListener;
+import com.dj.transmission.client.transmission.TransmissionState;
 import com.dj.transmission.config.TransmissionConfig;
 import com.dj.transmission.file.TransmissionFileInfo;
 
@@ -18,14 +20,30 @@ public class ReceiveClientTest {
                 @Override
                 public void onReceiveFileInfo(TransmissionClient client, TransmissionFileInfo fileInfo, AcceptController controller) {
                     System.out.println(System.currentTimeMillis() + " 对方 ip:" + client.getHostAddress() + " port:" + client.getCommandPort() + " 发来了文件信息 fileName:" + fileInfo.getFileName() + " fileSize:" + fileInfo.getFileSize() + " fileHash:" + fileInfo.getFileHash());
-                    controller.accept();
                     client.addOnSendClientListener(new OnSendClientListener() {
                         @Override
                         public void onAccept(Boolean accept) {
-                            System.out.println(System.currentTimeMillis() + "人家" + (accept ? "同意" : "拒绝") + "了");
+                            System.out.println(System.currentTimeMillis() + " 人家" + (accept ? "同意" : "拒绝") + "了");
+                        }
+
+                        @Override
+                        public void onProgress(double progress) {
+                            System.out.println(client.getSendFileInfo().getFileName() + " 发送进度：" + progress);
+                        }
+
+                        @Override
+                        public void onStateChange(TransmissionState state) {
+                            System.out.println((state == TransmissionState.START ? "开始" : "暂停") + "发送");
                         }
                     });
-                    client.sendFile(new File("D:\\360极速浏览器下载\\WeChatSetup.exe"));
+                    client.addOnReceiveClientListeners(new OnReceiveClientListener() {
+                        @Override
+                        public void onProgress(double progress) {
+                            System.out.println(client.getReceiveFileInfo().getFileName() + " 接收进度：" + progress);
+                        }
+                    });
+                    client.sendFile(new File("F:\\陈雷\\软件安装包\\iDisplayWin.exe"));
+                    controller.accept();
                 }
             });
             TransmissionClient client = transmission.createOrGetClient("127.0.0.1", transmission.getConfig().commandPort());

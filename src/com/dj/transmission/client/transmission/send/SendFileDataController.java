@@ -2,12 +2,14 @@ package com.dj.transmission.client.transmission.send;
 
 import com.dj.transmission.client.TransmissionClient;
 import com.dj.transmission.client.command.send.OnSendClientListener;
+import com.dj.transmission.client.transmission.TransmissionState;
 import com.dj.transmission.file.TransmissionFileInfo;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SendFileDataController {
@@ -15,25 +17,58 @@ public class SendFileDataController {
     private String hostAddress;
     private Integer port;
     private TransmissionFileInfo sendFileInfo;
-    private Boolean isStart;
+    private List<SendFileTask> tasks = new ArrayList<>();
 
     public SendFileDataController(TransmissionClient client, String hostAddress, Integer port, TransmissionFileInfo sendFileInfo) {
         this.client = client;
         this.hostAddress = hostAddress;
         this.port = port;
         this.sendFileInfo = sendFileInfo;
-        this.isStart = false;
     }
 
     public void start() {
-        isStart = true;
+        tasks.clear();
+        callStart();
         for (int i = 0; i < sendFileInfo.getSectionInfos().size(); i++) {
-            client.getFileTransmission().sendFilePool().execute(new SendFileTask(sendFileInfo, i, hostAddress, port));
+            SendFileTask sendFileTask = new SendFileTask(sendFileInfo, i, hostAddress, port);
+            tasks.add(sendFileTask);
+            client.getFileTransmission().sendFilePool().execute(sendFileTask);
         }
     }
 
     public void close() {
-        isStart = false;
+        for (SendFileTask task : tasks) {
+            task.close();
+        }
+        callPause();
+    }
+
+    private void callPause() {
+        List<OnSendClientListener> onSendClientListener = client.getOnSendClientListener();
+        client.getFileTransmission().getScheduler().run(new Runnable() {
+            @Override
+            public void run() {
+                if (onSendClientListener != null) {
+                    for (OnSendClientListener listener : onSendClientListener) {
+                        listener.onStateChange(TransmissionState.PAUSE);
+                    }
+                }
+            }
+        });
+    }
+
+    private void callStart() {
+        List<OnSendClientListener> onSendClientListener = client.getOnSendClientListener();
+        client.getFileTransmission().getScheduler().run(new Runnable() {
+            @Override
+            public void run() {
+                if (onSendClientListener != null) {
+                    for (OnSendClientListener listener : onSendClientListener) {
+                        listener.onStateChange(TransmissionState.START);
+                    }
+                }
+            }
+        });
     }
 
     public class SendFileTask implements Runnable{
@@ -45,12 +80,14 @@ public class SendFileDataController {
         private Socket socket;
         private RandomAccessFile randomAccessFile;
         private DataOutputStream dataOutputStream;
+        private Boolean isStart;
 
         public SendFileTask(TransmissionFileInfo fileInfo, Integer sectionIndex, String hostAddress, Integer port) {
             this.fileInfo = fileInfo;
             this.sectionIndex = sectionIndex;
             this.hostAddress = hostAddress;
             this.port = port;
+            isStart = true;
             connection();
         }
 
@@ -123,7 +160,7 @@ public class SendFileDataController {
                     if (client.getFileTransmission().getConfig().isDebug())
                         e.printStackTrace();
                 } finally {
-                    colse();
+                    socketClose();
                 }
             }
         }
@@ -142,7 +179,11 @@ public class SendFileDataController {
             });
         }
 
-        private void colse() {
+        public void close() {
+            isStart = false;
+        }
+
+        private void socketClose() {
             try {
                 if (randomAccessFile != null)
                     randomAccessFile.close();

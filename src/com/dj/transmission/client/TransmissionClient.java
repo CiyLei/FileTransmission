@@ -119,8 +119,18 @@ public class TransmissionClient implements SendCommandClientDelegate, ReceiveCom
     }
 
     public void pauseSend() {
-        if (sendFileDataController != null)
-            sendFileDataController.close();
+        if (transmission.isMainThread()) {
+            transmission.commandPool().execute(new Runnable() {
+                @Override
+                public void run() {
+                    if (sendFileDataController != null)
+                        sendFileDataController.close();
+                }
+            });
+        } else {
+            if (sendFileDataController != null)
+                sendFileDataController.close();
+        }
     }
 
     @Override
