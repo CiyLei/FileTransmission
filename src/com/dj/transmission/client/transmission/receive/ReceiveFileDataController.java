@@ -54,7 +54,7 @@ public class ReceiveFileDataController {
                         callProgress(reveiceFileInfo.getProgress());
                     }
                     if (!isStart){
-                        socketClose();
+                        break;
                     }
                 }
                 sectionInfo.setFinishIndex(randomAccessFile.getFilePointer());

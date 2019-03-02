@@ -20,6 +20,7 @@ public class ReceiveClientTest {
                 @Override
                 public void onReceiveFileInfo(TransmissionClient client, TransmissionFileInfo fileInfo, AcceptController controller) {
                     System.out.println(System.currentTimeMillis() + " 对方 ip:" + client.getHostAddress() + " port:" + client.getCommandPort() + " 发来了文件信息 fileName:" + fileInfo.getFileName() + " fileSize:" + fileInfo.getFileSize() + " fileHash:" + fileInfo.getFileHash());
+                    controller.accept();
                     client.addOnSendClientListener(new OnSendClientListener() {
                         @Override
                         public void onAccept(Boolean accept) {
@@ -43,7 +44,12 @@ public class ReceiveClientTest {
                         }
                     });
                     client.sendFile(new File("F:\\陈雷\\软件安装包\\iDisplayWin.exe"));
-                    controller.accept();
+//                    try {
+//                        Thread.sleep(1000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    client.pauseReceive();
                 }
             });
             TransmissionClient client = transmission.createOrGetClient("127.0.0.1", transmission.getConfig().commandPort());

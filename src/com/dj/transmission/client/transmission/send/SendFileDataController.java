@@ -28,7 +28,7 @@ public class SendFileDataController {
 
     public void start() {
         tasks.clear();
-        callStart();
+        client.sendClientStateChange(TransmissionState.START);
         for (int i = 0; i < sendFileInfo.getSectionInfos().size(); i++) {
             SendFileTask sendFileTask = new SendFileTask(sendFileInfo, i, hostAddress, port);
             tasks.add(sendFileTask);
@@ -40,35 +40,7 @@ public class SendFileDataController {
         for (SendFileTask task : tasks) {
             task.close();
         }
-        callPause();
-    }
-
-    private void callPause() {
-        List<OnSendClientListener> onSendClientListener = client.getOnSendClientListener();
-        client.getFileTransmission().getScheduler().run(new Runnable() {
-            @Override
-            public void run() {
-                if (onSendClientListener != null) {
-                    for (OnSendClientListener listener : onSendClientListener) {
-                        listener.onStateChange(TransmissionState.PAUSE);
-                    }
-                }
-            }
-        });
-    }
-
-    private void callStart() {
-        List<OnSendClientListener> onSendClientListener = client.getOnSendClientListener();
-        client.getFileTransmission().getScheduler().run(new Runnable() {
-            @Override
-            public void run() {
-                if (onSendClientListener != null) {
-                    for (OnSendClientListener listener : onSendClientListener) {
-                        listener.onStateChange(TransmissionState.START);
-                    }
-                }
-            }
-        });
+        client.sendClientStateChange(TransmissionState.PAUSE);
     }
 
     public class SendFileTask implements Runnable{

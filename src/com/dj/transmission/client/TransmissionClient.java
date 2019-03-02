@@ -9,7 +9,9 @@ import com.dj.transmission.client.command.receive.ReceiveCommandClientDelegateIm
 import com.dj.transmission.client.command.send.OnSendClientListener;
 import com.dj.transmission.client.command.send.SendCommandClientDelegate;
 import com.dj.transmission.client.command.send.SendCommandClientDelegateImp;
+import com.dj.transmission.client.transmission.TransmissionState;
 import com.dj.transmission.client.transmission.receive.ReceiveFileDataController;
+import com.dj.transmission.client.transmission.send.SendClientStateHandle;
 import com.dj.transmission.client.transmission.send.SendFileDataController;
 import com.dj.transmission.file.TransmissionFileInfo;
 
@@ -18,7 +20,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TransmissionClient implements SendCommandClientDelegate, ReceiveCommandClientDelegate {
+public class TransmissionClient implements SendCommandClientDelegate, ReceiveCommandClientDelegate, SendClientStateHandle {
     private String hostAddress;
     private Integer commandPort;
     // command发送端委托
@@ -33,6 +35,10 @@ public class TransmissionClient implements SendCommandClientDelegate, ReceiveCom
     // 接收文件数据的全部控制器
     private List<ReceiveFileDataController> receiveFileDataControllers = new ArrayList<>();
     private List<OnReceiveClientListener> onReceiveClientListeners = new ArrayList<>();
+    // 发送状态
+    private TransmissionState sendState = TransmissionState.PAUSE;
+    // 接收状态
+    private TransmissionState receiveState = TransmissionState.PAUSE;
 
     public TransmissionClient(FileTransmission transmission, String hostAddress, Integer commandPort) {
         this.transmission = transmission;
@@ -253,5 +259,28 @@ public class TransmissionClient implements SendCommandClientDelegate, ReceiveCom
 
     public List<OnReceiveClientListener> getOnReceiveClientListeners() {
         return onReceiveClientListeners;
+    }
+
+    /**
+     * 由 SendFileDataController 进行回调
+     * @param state
+     */
+    @Override
+    public void sendClientStateChange(TransmissionState state) {
+        sendState = state;
+        transmission.getScheduler().run(new Runnable() {
+            @Override
+            public void run() {
+                if (getOnSendClientListener() != null) {
+                    for (OnSendClientListener listener : getOnSendClientListener()) {
+                        listener.onStateChange(state);
+                    }
+                }
+            }
+        });
+    }
+
+    public TransmissionState getSendState() {
+        return sendState;
     }
 }
