@@ -130,23 +130,16 @@ public class SendFileDataController {
 
         private void callProgress(double progress) {
             List<OnSendClientListener> onSendClientListener = client.getOnSendClientListener();
-            if (!client.getFileTransmission().isMainThread()) {
-                client.getFileTransmission().getScheduler().run(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (onSendClientListener != null) {
-                            for (OnSendClientListener listener : onSendClientListener) {
-                                listener.onProgress(progress);
-                            }
+            client.getFileTransmission().getScheduler().run(new Runnable() {
+                @Override
+                public void run() {
+                    if (onSendClientListener != null) {
+                        for (OnSendClientListener listener : onSendClientListener) {
+                            listener.onProgress(progress);
                         }
                     }
-                });
-            }
-            if (onSendClientListener != null) {
-                for (OnSendClientListener listener : onSendClientListener) {
-                    listener.onProgress(progress);
                 }
-            }
+            });
         }
 
         private void colse() {

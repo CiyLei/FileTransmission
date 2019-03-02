@@ -3,6 +3,7 @@ package com.dj.transmission.client;
 import com.dj.transmission.FileTransmission;
 import com.dj.transmission.client.command.OnConnectionListener;
 import com.dj.transmission.client.command.CommandClientHandle;
+import com.dj.transmission.client.command.receive.OnReceiveClientListener;
 import com.dj.transmission.client.command.receive.ReceiveCommandClientDelegate;
 import com.dj.transmission.client.command.receive.ReceiveCommandClientDelegateImp;
 import com.dj.transmission.client.command.send.OnSendClientListener;
@@ -20,12 +21,18 @@ import java.util.List;
 public class TransmissionClient implements SendCommandClientDelegate, ReceiveCommandClientDelegate {
     private String hostAddress;
     private Integer commandPort;
+    // command发送端委托
     private SendCommandClientDelegate sendCommandClientDelegate;
+    // command接收端委托
     private ReceiveCommandClientDelegate receiveCommandClientDelegate;
     private FileTransmission transmission;
+    // command连接回调
     private List<OnConnectionListener> onConnectionListeners = new ArrayList<>();
+    // 发送文件数据的控制器
     private SendFileDataController sendFileDataController;
+    // 接收文件数据的全部控制器
     private List<ReceiveFileDataController> receiveFileDataControllers = new ArrayList<>();
+    private List<OnReceiveClientListener> onReceiveClientListeners = new ArrayList<>();
 
     public TransmissionClient(FileTransmission transmission, String hostAddress, Integer commandPort) {
         this.transmission = transmission;
@@ -131,7 +138,7 @@ public class TransmissionClient implements SendCommandClientDelegate, ReceiveCom
     @Override
     public List<OnSendClientListener> getOnSendClientListener() {
         if (sendCommandClientDelegate != null)
-            sendCommandClientDelegate.getOnSendClientListener();
+            return sendCommandClientDelegate.getOnSendClientListener();
         return null;
     }
 
@@ -220,9 +227,21 @@ public class TransmissionClient implements SendCommandClientDelegate, ReceiveCom
      * @param commandPort
      */
     public void setCommandPort(Integer commandPort) {
-        if (commandPort != null) {
+        if (commandPort != null && !commandPort.equals(this.commandPort)) {
             this.commandPort = commandPort;
             this.sendCommandClientDelegate = new SendCommandClientDelegateImp(this, hostAddress, commandPort, onConnectionListeners, handle);
         }
+    }
+
+    public void addOnReceiveClientListeners(OnReceiveClientListener listeners) {
+        onReceiveClientListeners.add(listeners);
+    }
+
+    public void removeOnReceiveClientListeners(OnReceiveClientListener listeners) {
+        onReceiveClientListeners.remove(listeners);
+    }
+
+    public List<OnReceiveClientListener> getOnReceiveClientListeners() {
+        return onReceiveClientListeners;
     }
 }

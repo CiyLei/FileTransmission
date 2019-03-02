@@ -1,6 +1,7 @@
 package com.dj.transmission.client.transmission.receive;
 
 import com.dj.transmission.client.TransmissionClient;
+import com.dj.transmission.client.command.receive.OnReceiveClientListener;
 import com.dj.transmission.file.TransmissionFileInfo;
 import com.dj.transmission.file.TransmissionFileSectionInfo;
 
@@ -9,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.Socket;
+import java.util.List;
 
 public class ReceiveFileDataController {
     private TransmissionClient client;
@@ -49,16 +51,14 @@ public class ReceiveFileDataController {
                     if (System.currentTimeMillis() - ct >= client.getFileTransmission().getConfig().sendFileUpdateFrequency()) {
                         sectionInfo.setFinishIndex(randomAccessFile.getFilePointer());
                         ct = System.currentTimeMillis();
-                        // TODO 接收文件回调
-                        System.out.println("接收进度：" + reveiceFileInfo.getProgress());
+                        callProgress(reveiceFileInfo.getProgress());
                     }
                     if (!isStart){
                         socketClose();
                     }
                 }
                 sectionInfo.setFinishIndex(randomAccessFile.getFilePointer());
-                // TODO 接收文件回调
-                System.out.println("接收进度：" + reveiceFileInfo.getProgress());
+                callProgress(reveiceFileInfo.getProgress());
             } else {
                 socketClose();
             }
@@ -68,6 +68,20 @@ public class ReceiveFileDataController {
         } finally {
             socketClose();
         }
+    }
+
+    private void callProgress(double progress) {
+        List<OnReceiveClientListener> onReceiveClientListeners = client.getOnReceiveClientListeners();
+        client.getFileTransmission().getScheduler().run(new Runnable() {
+            @Override
+            public void run() {
+                if (onReceiveClientListeners != null) {
+                    for (OnReceiveClientListener listener : onReceiveClientListeners) {
+                        listener.onProgress(progress);
+                    }
+                }
+            }
+        });
     }
 
     private synchronized String createSaveFilePath(String saveFilePath) {

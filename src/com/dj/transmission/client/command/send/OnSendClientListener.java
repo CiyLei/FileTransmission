@@ -1,5 +1,10 @@
 package com.dj.transmission.client.command.send;
 
+import com.dj.transmission.client.transmission.TransmissionState;
+
+/**
+ * 作为一个发送端的接口回调
+ */
 public abstract class OnSendClientListener {
 
     /**
@@ -24,10 +29,6 @@ public abstract class OnSendClientListener {
      * 开始或者暂停的状态改变
      * @param state
      */
-    public void onStateChange(SendClientState state) {}
+    public void onStateChange(TransmissionState state) {}
 
-    enum SendClientState {
-        START,
-        PAUSE
-    }
 }
