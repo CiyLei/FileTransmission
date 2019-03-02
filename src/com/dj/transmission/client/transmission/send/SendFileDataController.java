@@ -1,12 +1,14 @@
 package com.dj.transmission.client.transmission.send;
 
 import com.dj.transmission.client.TransmissionClient;
+import com.dj.transmission.client.command.send.OnSendClientListener;
 import com.dj.transmission.file.TransmissionFileInfo;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.Socket;
+import java.util.List;
 
 public class SendFileDataController {
     private TransmissionClient client;
@@ -97,8 +99,7 @@ public class SendFileDataController {
                                 if (System.currentTimeMillis() - ct >= client.getFileTransmission().getConfig().sendFileUpdateFrequency()) {
                                     fileInfo.getSectionInfos().get(sectionIndex).setFinishIndex(randomAccessFile.getFilePointer());
                                     ct = System.currentTimeMillis();
-                                    // TODO 发送进度回调
-                                    System.out.println("发送进度：" + fileInfo.getProgress());
+                                    callProgress(fileInfo.getProgress());
                                 }
                             }
                         } else {
@@ -107,8 +108,7 @@ public class SendFileDataController {
                                 dataOutputStream.write(buffer);
                                 dataOutputStream.flush();
                                 fileInfo.getSectionInfos().get(sectionIndex).setFinishIndex(randomAccessFile.getFilePointer());
-                                // TODO 发送进度回调
-                                System.out.println("发送进度：" + fileInfo.getProgress());
+                                callProgress(fileInfo.getProgress());
                             }
                             return;
                         }
@@ -116,8 +116,7 @@ public class SendFileDataController {
                     // 如果中途暂停了
                     if (!isStart) {
                         fileInfo.getSectionInfos().get(sectionIndex).setFinishIndex(randomAccessFile.getFilePointer());
-                        // TODO 发送进度回调
-                        System.out.println("发送进度：" + fileInfo.getProgress());
+                        callProgress(fileInfo.getProgress());
                     }
 
                 } catch (IOException e) {
@@ -125,6 +124,27 @@ public class SendFileDataController {
                         e.printStackTrace();
                 } finally {
                     colse();
+                }
+            }
+        }
+
+        private void callProgress(double progress) {
+            List<OnSendClientListener> onSendClientListener = client.getOnSendClientListener();
+            if (!client.getFileTransmission().isMainThread()) {
+                client.getFileTransmission().getScheduler().run(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (onSendClientListener != null) {
+                            for (OnSendClientListener listener : onSendClientListener) {
+                                listener.onProgress(progress);
+                            }
+                        }
+                    }
+                });
+            }
+            if (onSendClientListener != null) {
+                for (OnSendClientListener listener : onSendClientListener) {
+                    listener.onProgress(progress);
                 }
             }
         }

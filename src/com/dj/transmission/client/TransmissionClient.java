@@ -129,6 +129,13 @@ public class TransmissionClient implements SendCommandClientDelegate, ReceiveCom
     }
 
     @Override
+    public List<OnSendClientListener> getOnSendClientListener() {
+        if (sendCommandClientDelegate != null)
+            sendCommandClientDelegate.getOnSendClientListener();
+        return null;
+    }
+
+    @Override
     public void close() {
         if (sendCommandClientDelegate != null)
             sendCommandClientDelegate.close();

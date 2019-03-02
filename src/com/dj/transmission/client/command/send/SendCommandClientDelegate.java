@@ -3,6 +3,7 @@ package com.dj.transmission.client.command.send;
 import com.dj.transmission.file.TransmissionFileInfo;
 
 import java.io.File;
+import java.util.List;
 
 public interface SendCommandClientDelegate {
 
@@ -39,6 +40,11 @@ public interface SendCommandClientDelegate {
      * @param listener
      */
     void removeOnSendClientListener(OnSendClientListener listener);
+
+    /**
+     * 获取回调
+     */
+    List<OnSendClientListener> getOnSendClientListener();
 
     /**
      * 关闭连接

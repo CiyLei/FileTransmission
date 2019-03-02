@@ -91,6 +91,11 @@ public class SendCommandClientDelegateImp implements SendCommandClientDelegate, 
         onSendClientListeners.remove(listener);
     }
 
+    @Override
+    public List<OnSendClientListener> getOnSendClientListener() {
+        return onSendClientListeners;
+    }
+
     public void addOnConnectionListener(OnConnectionListener listener) {
         onConnectionListeners.add(listener);
     }
