@@ -150,7 +150,7 @@ public class SendCommandClientDelegateImp implements SendCommandClientDelegate, 
                 if (i == client.getFileTransmission().getConfig().sendFileTaskThreadCount() - 1)
                     endIndex = sendFileInfo.getFileSize() - 1;
                 TransmissionFileSectionInfo sectionFileInfo = new TransmissionFileSectionInfo(i * average, endIndex, i * average);
-                sendFileInfo.getSectionInfos().add(sectionFileInfo);
+                sendFileInfo.addSectionInfo(sectionFileInfo);
             }
         }
         // 进行回调
@@ -164,7 +164,7 @@ public class SendCommandClientDelegateImp implements SendCommandClientDelegate, 
         });
         if (accept) {
             // 通知client端发送过来的sendFilePort，马上进行传输文件数据
-            handle.handleCommandStart(sendFilePort);
+            handle.sendClientHandleStartCommand(sendFilePort);
         }
     }
 

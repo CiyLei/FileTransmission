@@ -2,10 +2,15 @@ package com.dj.transmission.client.command;
 
 public interface CommandClientHandle {
     /**
-     * 处理真正的发送消息动作
+     * 作为发送端，得到了同意接收的答复
      * @param sendFilePort
      */
-    void handleCommandStart(Integer sendFilePort);
+    void sendClientHandleStartCommand(Integer sendFilePort);
+
+    /**
+     * 作为接收端，同意了开始接收
+     */
+    void receiveClientHandleAccept();
 
     /**
      * 处理继续发送动作

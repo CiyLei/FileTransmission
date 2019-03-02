@@ -159,7 +159,7 @@ public class FileTransmission implements TransmissionAdapter {
             for (int i = 0; i < clients.size(); i++) {
                 // 必须保证在这个列表里面，说明是经过command的，不是谁传过来我都收的
                 if (clients.get(i).getHostAddress().equals(address)) {
-                    clients.get(i).addReceiveFileDataController(socket);
+                    clients.get(i).addReceiveFileDataTask(socket);
                     return;
                 }
             }

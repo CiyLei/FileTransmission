@@ -105,6 +105,7 @@ public class ReceiveCommandClientDelegateImp implements ReceiveCommandClientDele
 
     @Override
     public void accept() {
+        handle.receiveClientHandleAccept();
         if (client.getFileTransmission().isMainThread()) {
             client.getFileTransmission().commandPool().execute(new Runnable() {
                 @Override

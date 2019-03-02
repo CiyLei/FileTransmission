@@ -1,115 +1,51 @@
 package com.dj.transmission.client.transmission.receive;
 
 import com.dj.transmission.client.TransmissionClient;
-import com.dj.transmission.client.command.receive.OnReceiveClientListener;
-import com.dj.transmission.file.TransmissionFileInfo;
-import com.dj.transmission.file.TransmissionFileSectionInfo;
+import com.dj.transmission.client.transmission.TransmissionState;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReceiveFileDataController {
     private TransmissionClient client;
-    private Socket socket;
-    private TransmissionFileInfo reveiceFileInfo;
-    private DataInputStream dataInputStream;
-    private RandomAccessFile randomAccessFile;
-    private Boolean isStart;
+    private ReceiveClientStateHandle receiveClientStateHandle;
+    private List<ReceiveFileDataTask> receiveFileDataTasks = new ArrayList<>();
+    /**
+     * 作为一个接收端，文件是分段传过来的，如果在接收到一个socket就改变状态的话，有这么一种情况
+     * 文件被分割了5段，在收到前3段的socket的时候，用户暂停了接收，这时候文件后2段又传了过来，那么状态就又变成了开始接收的
+     * 所以这里有一个文件hash值得标志符，只有在第一次hashFlag等于null或者传过来的hash不一样的时候，才能改变开始状态
+     */
+    private String hashFlag;
 
-    public ReceiveFileDataController(TransmissionClient client, Socket socket, TransmissionFileInfo reveiceFileInfo) {
+    public ReceiveFileDataController(TransmissionClient client, ReceiveClientStateHandle receiveClientStateHandle) {
         this.client = client;
-        this.socket = socket;
-        this.reveiceFileInfo = reveiceFileInfo;
-        this.isStart = false;
+        this.receiveClientStateHandle = receiveClientStateHandle;
     }
 
-    public void start() {
-        isStart = true;
-        try {
-            dataInputStream = new DataInputStream(socket.getInputStream());
-            String fileHash = dataInputStream.readUTF();
-            // 如果传输过来的文件hash与之前接收的文件hash值对不上的话，直接关闭拒绝接收
-            if (reveiceFileInfo.getFileHash().equals(fileHash)) {
-                Long startIndex = dataInputStream.readLong();
-                Long endIndex = dataInputStream.readLong();
-                Long finishIndex = dataInputStream.readLong();
-                TransmissionFileSectionInfo sectionInfo = new TransmissionFileSectionInfo(startIndex, endIndex, finishIndex);
-                reveiceFileInfo.getSectionInfos().add(sectionInfo);
-                String saveFilePath = createSaveFilePath(client.getFileTransmission().getConfig().saveFilePath());
-                randomAccessFile = new RandomAccessFile(saveFilePath + reveiceFileInfo.getFileName(), "rwd");
-                randomAccessFile.seek(finishIndex);
-                byte[] buffer = new byte[1024 * 4];
-                int len = -1;
-                // 保持一段时间再更新一下
-                Long ct = System.currentTimeMillis();
-                while((len = socket.getInputStream().read(buffer)) != -1){
-                    randomAccessFile.write(buffer, 0, len);
-                    if (System.currentTimeMillis() - ct >= client.getFileTransmission().getConfig().sendFileUpdateFrequency()) {
-                        sectionInfo.setFinishIndex(randomAccessFile.getFilePointer());
-                        ct = System.currentTimeMillis();
-                        callProgress(reveiceFileInfo.getProgress());
-                    }
-                    if (!isStart){
-                        break;
-                    }
-                }
-                sectionInfo.setFinishIndex(randomAccessFile.getFilePointer());
-                callProgress(reveiceFileInfo.getProgress());
-            } else {
-                socketClose();
-            }
-        } catch (IOException e) {
-            if (client.getFileTransmission().getConfig().isDebug())
-                e.printStackTrace();
-        } finally {
-            socketClose();
-        }
-    }
-
-    private void callProgress(double progress) {
-        List<OnReceiveClientListener> onReceiveClientListeners = client.getOnReceiveClientListeners();
-        client.getFileTransmission().getScheduler().run(new Runnable() {
-            @Override
-            public void run() {
-                if (onReceiveClientListeners != null) {
-                    for (OnReceiveClientListener listener : onReceiveClientListeners) {
-                        listener.onProgress(progress);
-                    }
-                }
-            }
-        });
-    }
-
-    private synchronized String createSaveFilePath(String saveFilePath) {
-        String path = saveFilePath + (saveFilePath.endsWith(File.separator) ? "" : File.separator);
-        File file = new File(path);
-        if (!file.exists())
-            file.mkdirs();
-        return path;
+    public void addReceiveFileDataTask(ReceiveFileDataTask task) {
+        receiveFileDataTasks.add(task);
+        client.getFileTransmission().sendFilePool().execute(task);
     }
 
     public void close() {
-        isStart = false;
+        for (ReceiveFileDataTask task : receiveFileDataTasks) {
+            task.close();
+        }
+        receiveClientStateHandle.receiveClientStateChange(TransmissionState.PAUSE);
     }
 
-    private void socketClose() {
-        try {
-            if (randomAccessFile != null)
-                randomAccessFile.close();
-            if (dataInputStream != null)
-                dataInputStream.close();
-            if (socket != null)
-                socket.close();
-        } catch (IOException e1) {
-            if (client.getFileTransmission().getConfig().isDebug())
-                e1.printStackTrace();
+    public void verificationStart(String hash) {
+        if (hashFlag == null || !hashFlag.equals(hash)) {
+            hashFlag = hash;
+            receiveClientStateHandle.receiveClientStateChange(TransmissionState.START);
         }
-        randomAccessFile = null;
-        dataInputStream = null;
-        socket = null;
+    }
+
+    public List<ReceiveFileDataTask> getReceiveFileDataTasks() {
+        return receiveFileDataTasks;
+    }
+
+    public ReceiveClientStateHandle getReceiveClientStateHandle() {
+        return receiveClientStateHandle;
     }
 }

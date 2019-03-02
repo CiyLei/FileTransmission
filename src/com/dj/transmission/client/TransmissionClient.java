@@ -10,7 +10,9 @@ import com.dj.transmission.client.command.send.OnSendClientListener;
 import com.dj.transmission.client.command.send.SendCommandClientDelegate;
 import com.dj.transmission.client.command.send.SendCommandClientDelegateImp;
 import com.dj.transmission.client.transmission.TransmissionState;
+import com.dj.transmission.client.transmission.receive.ReceiveClientStateHandle;
 import com.dj.transmission.client.transmission.receive.ReceiveFileDataController;
+import com.dj.transmission.client.transmission.receive.ReceiveFileDataTask;
 import com.dj.transmission.client.transmission.send.SendClientStateHandle;
 import com.dj.transmission.client.transmission.send.SendFileDataController;
 import com.dj.transmission.file.TransmissionFileInfo;
@@ -20,7 +22,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TransmissionClient implements SendCommandClientDelegate, ReceiveCommandClientDelegate, SendClientStateHandle {
+public class TransmissionClient implements SendCommandClientDelegate, ReceiveCommandClientDelegate {
     private String hostAddress;
     private Integer commandPort;
     // command发送端委托
@@ -32,8 +34,9 @@ public class TransmissionClient implements SendCommandClientDelegate, ReceiveCom
     private List<OnConnectionListener> onConnectionListeners = new ArrayList<>();
     // 发送文件数据的控制器
     private SendFileDataController sendFileDataController;
-    // 接收文件数据的全部控制器
-    private List<ReceiveFileDataController> receiveFileDataControllers = new ArrayList<>();
+    // 接收文件数据的控制器
+    private ReceiveFileDataController receiveFileDataController;
+    // 接收端的回调
     private List<OnReceiveClientListener> onReceiveClientListeners = new ArrayList<>();
     // 发送状态
     private TransmissionState sendState = TransmissionState.PAUSE;
@@ -43,6 +46,7 @@ public class TransmissionClient implements SendCommandClientDelegate, ReceiveCom
     public TransmissionClient(FileTransmission transmission, String hostAddress, Integer commandPort) {
         this.transmission = transmission;
         this.hostAddress = hostAddress;
+        this.receiveFileDataController = new ReceiveFileDataController(this, receiveClientStateHandle);
         if (commandPort != null) {
             this.commandPort = commandPort;
             this.sendCommandClientDelegate = new SendCommandClientDelegateImp(this, hostAddress, commandPort, onConnectionListeners, handle);
@@ -55,9 +59,14 @@ public class TransmissionClient implements SendCommandClientDelegate, ReceiveCom
 
     private CommandClientHandle handle = new CommandClientHandle() {
         @Override
-        public void handleCommandStart(Integer sendFilePort) {
-            sendFileDataController = new SendFileDataController(TransmissionClient.this, hostAddress, sendFilePort, getSendFileInfo());
+        public void sendClientHandleStartCommand(Integer sendFilePort) {
+            sendFileDataController = new SendFileDataController(TransmissionClient.this, hostAddress, sendFilePort, getSendFileInfo(), sendClientStateHandle);
             sendFileDataController.start();
+        }
+
+        @Override
+        public void receiveClientHandleAccept() {
+            receiveFileDataController.getReceiveFileDataTasks().clear();
         }
 
         @Override
@@ -200,8 +209,17 @@ public class TransmissionClient implements SendCommandClientDelegate, ReceiveCom
     }
 
     public void pauseReceive() {
-        for (ReceiveFileDataController receiveFileDataController : receiveFileDataControllers) {
-            receiveFileDataController.close();
+        if (transmission.isMainThread()) {
+            transmission.commandPool().execute(new Runnable() {
+                @Override
+                public void run() {
+                    if (receiveFileDataController != null)
+                        receiveFileDataController.close();
+                }
+            });
+        } else {
+            if (receiveFileDataController != null)
+                receiveFileDataController.close();
         }
     }
 
@@ -221,12 +239,11 @@ public class TransmissionClient implements SendCommandClientDelegate, ReceiveCom
      * 设置接收文件的socket
      * @param socket
      */
-    public void addReceiveFileDataController(Socket socket) {
+    public void addReceiveFileDataTask(Socket socket) {
         if (getReceiveFileInfo() != null) {
             // 开始接收文件信息
-            ReceiveFileDataController receiveFileDataController = new ReceiveFileDataController(this, socket, getReceiveFileInfo());
-            receiveFileDataController.start();
-            receiveFileDataControllers.add(receiveFileDataController);
+            ReceiveFileDataTask receiveFileDataTask = new ReceiveFileDataTask(this, socket, getReceiveFileInfo(), receiveFileDataController);
+            receiveFileDataController.addReceiveFileDataTask(receiveFileDataTask);
         }
     }
 
@@ -265,20 +282,44 @@ public class TransmissionClient implements SendCommandClientDelegate, ReceiveCom
      * 由 SendFileDataController 进行回调
      * @param state
      */
-    @Override
-    public void sendClientStateChange(TransmissionState state) {
-        sendState = state;
-        transmission.getScheduler().run(new Runnable() {
-            @Override
-            public void run() {
-                if (getOnSendClientListener() != null) {
-                    for (OnSendClientListener listener : getOnSendClientListener()) {
-                        listener.onStateChange(state);
+    private SendClientStateHandle sendClientStateHandle = new SendClientStateHandle() {
+
+        @Override
+        public void sendClientStateChange(TransmissionState state) {
+            sendState = state;
+            transmission.getScheduler().run(new Runnable() {
+                @Override
+                public void run() {
+                    if (getOnSendClientListener() != null) {
+                        for (OnSendClientListener listener : getOnSendClientListener()) {
+                            listener.onStateChange(state);
+                        }
                     }
                 }
-            }
-        });
-    }
+            });
+        }
+    };
+
+    /**
+     * 由 ReceiveFileDataController 进行回调
+     * @param state
+     */
+    private ReceiveClientStateHandle receiveClientStateHandle = new ReceiveClientStateHandle() {
+        @Override
+        public void receiveClientStateChange(TransmissionState state) {
+            receiveState = state;
+            transmission.getScheduler().run(new Runnable() {
+                @Override
+                public void run() {
+                    if (getOnReceiveClientListeners() != null) {
+                        for (OnReceiveClientListener listener : getOnReceiveClientListeners()) {
+                            listener.onStateChange(state);
+                        }
+                    }
+                }
+            });
+        }
+    };
 
     public TransmissionState getSendState() {
         return sendState;

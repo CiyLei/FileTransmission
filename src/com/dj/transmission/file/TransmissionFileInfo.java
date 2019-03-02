@@ -45,14 +45,22 @@ public class TransmissionFileInfo {
         return sectionInfos;
     }
 
+    public void addSectionInfo(TransmissionFileSectionInfo sectionInfo) {
+        synchronized (TransmissionFileInfo.class) {
+            sectionInfos.add(sectionInfo);
+        }
+    }
+
     public File getFile() {
         return file;
     }
 
-    public synchronized double getProgress() {
+    public double getProgress() {
         Long sunSize = 0l;
-        for (TransmissionFileSectionInfo sectionFileInfo : sectionInfos) {
-            sunSize += sectionFileInfo.getFinishIndex() - sectionFileInfo.getStartIndex();
+        synchronized (TransmissionFileInfo.class) {
+            for (TransmissionFileSectionInfo sectionFileInfo : sectionInfos) {
+                sunSize += sectionFileInfo.getFinishIndex() - sectionFileInfo.getStartIndex();
+            }
         }
         return sunSize.doubleValue() / fileSize.doubleValue();
     }

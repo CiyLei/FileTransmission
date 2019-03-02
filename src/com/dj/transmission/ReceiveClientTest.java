@@ -42,14 +42,19 @@ public class ReceiveClientTest {
                         public void onProgress(double progress) {
                             System.out.println(client.getReceiveFileInfo().getFileName() + " 接收进度：" + progress);
                         }
+
+                        @Override
+                        public void onStateChange(TransmissionState state) {
+                            System.out.println((state == TransmissionState.START ? "开始" : "暂停") + "接收");
+                        }
                     });
                     client.sendFile(new File("F:\\陈雷\\软件安装包\\iDisplayWin.exe"));
-//                    try {
-//                        Thread.sleep(1000);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                    client.pauseReceive();
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    client.pauseReceive();
                 }
             });
             TransmissionClient client = transmission.createOrGetClient("127.0.0.1", transmission.getConfig().commandPort());
