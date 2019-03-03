@@ -2,7 +2,6 @@ package com.dj.transmission.client.transmission.receive;
 
 import com.dj.transmission.client.TransmissionClient;
 import com.dj.transmission.client.command.receive.OnReceiveClientListener;
-import com.dj.transmission.client.transmission.TransmissionState;
 import com.dj.transmission.file.TransmissionFileInfo;
 import com.dj.transmission.file.TransmissionFileSectionInfo;
 
@@ -64,9 +63,10 @@ public class ReceiveFileDataTask implements Runnable{
                 }
                 sectionInfo.setFinishIndex(randomAccessFile.getFilePointer());
                 callProgress(reveiceFileInfo.getProgress());
+                isStart = false;
                 if (endIndex != randomAccessFile.getFilePointer() - 1) {
 //                    controller.getReceiveClientStateHandle().receiveClientStateChange(TransmissionState.PAUSE);
-                    controller.setHashFlagNull();
+                    controller.checkAllClose();
                 }
             } else {
                 socketClose();
@@ -75,7 +75,7 @@ public class ReceiveFileDataTask implements Runnable{
             if (client.getFileTransmission().getConfig().isDebug())
                 e.printStackTrace();
 //            controller.getReceiveClientStateHandle().receiveClientStateChange(TransmissionState.PAUSE);
-            controller.setHashFlagNull();
+            controller.checkAllClose();
         } finally {
             socketClose();
         }
@@ -105,6 +105,10 @@ public class ReceiveFileDataTask implements Runnable{
 
     public void close() {
         isStart = false;
+    }
+
+    public Boolean isStart() {
+        return isStart;
     }
 
     private void socketClose() {

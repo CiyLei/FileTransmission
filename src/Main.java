@@ -58,7 +58,7 @@ public class Main {
                 }
             });
             client.sendFile(new File("F:\\陈雷\\软件安装包\\WePE_64_V2.0.exe"));
-//            Thread.sleep(1000);
+//            Thread.sleep(1500);
 //            /**
 //             * 为什么暂停了之后过了一会onProgress会回调呢？
 //             * 你看 你在config里面是不是设置了sendFileUpdateFrequency更新频率，所以onProgress并不是实时的，暂停了之后，后续也会继续将真实的数值回调回来

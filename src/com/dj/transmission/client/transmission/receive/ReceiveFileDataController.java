@@ -22,21 +22,20 @@ public class ReceiveFileDataController {
         this.receiveClientStateHandle = receiveClientStateHandle;
     }
 
-    public void addReceiveFileDataTask(ReceiveFileDataTask task) {
+    public synchronized void addReceiveFileDataTask(ReceiveFileDataTask task) {
         receiveFileDataTasks.add(task);
         client.getFileTransmission().sendFilePool().execute(task);
     }
 
-    public void close() {
+    public synchronized void close() {
         for (ReceiveFileDataTask task : receiveFileDataTasks) {
             task.close();
         }
-        setHashFlagNull();
+        checkAllClose();
     }
 
     public void verificationStart(String hash) {
-        if (hashFlag == null || !hashFlag.equals(hash)) { // || client.getReceiveState() == TransmissionState.PAUSE) {
-            hashFlag = hash;
+        if (client.getReceiveFileInfo() != null && client.getReceiveFileInfo().getFileHash().equals(hash) && client.getReceiveState() == TransmissionState.PAUSE) {
             receiveClientStateHandle.receiveClientStateChange(TransmissionState.START);
         }
     }
@@ -49,10 +48,11 @@ public class ReceiveFileDataController {
         return receiveClientStateHandle;
     }
 
-    public void setHashFlagNull() {
-        if (hashFlag != null) {
-            receiveClientStateHandle.receiveClientStateChange(TransmissionState.PAUSE);
-            hashFlag = null;
+    public synchronized void checkAllClose() {
+        for (ReceiveFileDataTask task : receiveFileDataTasks) {
+            if (task.isStart())
+                return;
         }
+        receiveClientStateHandle.receiveClientStateChange(TransmissionState.PAUSE);
     }
 }
