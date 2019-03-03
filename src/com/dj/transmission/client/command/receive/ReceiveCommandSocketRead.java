@@ -68,7 +68,10 @@ public class ReceiveCommandSocketRead {
                     break;
                 // 开始
                 case 3:
-
+                    if (split.length == 2) {
+                        String fileHash = split[1];
+                        handle.handleReceiveFileInfoCommand(fileHash);
+                    }
                     break;
             }
         }

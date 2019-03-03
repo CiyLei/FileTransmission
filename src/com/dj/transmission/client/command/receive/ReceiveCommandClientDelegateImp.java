@@ -99,6 +99,14 @@ public class ReceiveCommandClientDelegateImp implements ReceiveCommandClientDele
     }
 
     @Override
+    public void handleReceiveFileInfoCommand(String fileHash) {
+        if (receiveFileInfo != null && receiveFileInfo.getFileHash().equals(fileHash) && socketWrite != null) {
+            socketWrite.sendFileReceiveInfo(receiveFileInfo);
+            receiveFileInfo.getSectionInfos().clear();
+        }
+    }
+
+    @Override
     public void streamClose() {
         close();
     }

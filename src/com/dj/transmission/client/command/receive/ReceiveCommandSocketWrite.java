@@ -1,6 +1,8 @@
 package com.dj.transmission.client.command.receive;
 
 import com.dj.transmission.client.TransmissionClient;
+import com.dj.transmission.file.TransmissionFileInfo;
+import com.dj.transmission.file.TransmissionFileSectionInfo;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -58,6 +60,32 @@ public class ReceiveCommandSocketWrite {
         } catch (IOException e) {
             if (client.getFileTransmission().getConfig().isDebug())
                 e.printStackTrace();
+        }
+    }
+
+    public void sendFileReceiveInfo(TransmissionFileInfo receiveFileInfo) {
+        connection();
+        if (isConnection() && stream != null) {
+            try {
+                StringBuffer sb = new StringBuffer("4,");
+                sb.append(receiveFileInfo.getFileHash());
+                synchronized (receiveFileInfo.getSectionInfos()) {
+                    for (TransmissionFileSectionInfo sectionInfo : receiveFileInfo.getSectionInfos()) {
+                        sb.append(",");
+                        sb.append(sectionInfo.getStartIndex());
+                        sb.append("-");
+                        sb.append(sectionInfo.getEndIndex());
+                        sb.append("-");
+                        sb.append(sectionInfo.getFinishIndex());
+                    }
+                }
+                stream.writeUTF(sb.toString());
+                stream.flush();
+            } catch (IOException e) {
+                if (client.getFileTransmission().getConfig().isDebug())
+                    e.printStackTrace();
+                close();
+            }
         }
     }
 }

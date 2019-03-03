@@ -43,7 +43,7 @@ public class ReceiveFileDataTask implements Runnable{
                 Long endIndex = dataInputStream.readLong();
                 Long finishIndex = dataInputStream.readLong();
                 TransmissionFileSectionInfo sectionInfo = new TransmissionFileSectionInfo(startIndex, endIndex, finishIndex);
-                reveiceFileInfo.addSectionInfo(sectionInfo);
+                reveiceFileInfo.getSectionInfos().add(sectionInfo);
                 String saveFilePath = createSaveFilePath(client.getFileTransmission().getConfig().saveFilePath());
                 randomAccessFile = new RandomAccessFile(saveFilePath + reveiceFileInfo.getFileName(), "rwd");
                 randomAccessFile.seek(finishIndex);
@@ -65,7 +65,8 @@ public class ReceiveFileDataTask implements Runnable{
                 sectionInfo.setFinishIndex(randomAccessFile.getFilePointer());
                 callProgress(reveiceFileInfo.getProgress());
                 if (endIndex != randomAccessFile.getFilePointer() - 1) {
-                    controller.getReceiveClientStateHandle().receiveClientStateChange(TransmissionState.PAUSE);
+//                    controller.getReceiveClientStateHandle().receiveClientStateChange(TransmissionState.PAUSE);
+                    controller.setHashFlagNull();
                 }
             } else {
                 socketClose();
@@ -73,7 +74,8 @@ public class ReceiveFileDataTask implements Runnable{
         } catch (IOException e) {
             if (client.getFileTransmission().getConfig().isDebug())
                 e.printStackTrace();
-            controller.getReceiveClientStateHandle().receiveClientStateChange(TransmissionState.PAUSE);
+//            controller.getReceiveClientStateHandle().receiveClientStateChange(TransmissionState.PAUSE);
+            controller.setHashFlagNull();
         } finally {
             socketClose();
         }

@@ -31,11 +31,11 @@ public class ReceiveFileDataController {
         for (ReceiveFileDataTask task : receiveFileDataTasks) {
             task.close();
         }
-        receiveClientStateHandle.receiveClientStateChange(TransmissionState.PAUSE);
+        setHashFlagNull();
     }
 
     public void verificationStart(String hash) {
-        if (hashFlag == null || !hashFlag.equals(hash)) {
+        if (hashFlag == null || !hashFlag.equals(hash)) { // || client.getReceiveState() == TransmissionState.PAUSE) {
             hashFlag = hash;
             receiveClientStateHandle.receiveClientStateChange(TransmissionState.START);
         }
@@ -47,5 +47,12 @@ public class ReceiveFileDataController {
 
     public ReceiveClientStateHandle getReceiveClientStateHandle() {
         return receiveClientStateHandle;
+    }
+
+    public void setHashFlagNull() {
+        if (hashFlag != null) {
+            receiveClientStateHandle.receiveClientStateChange(TransmissionState.PAUSE);
+            hashFlag = null;
+        }
     }
 }

@@ -10,6 +10,12 @@ public interface ReceiveCommandClientHandle {
     void handleFileInfoCommand(String fileName, Long fileSize, String fileHash, Integer commandPort);
 
     /**
+     * 处理查看当前接收情况
+     * @param fileHash
+     */
+    void handleReceiveFileInfoCommand(String fileHash);
+
+    /**
      * 读取流被关闭了
      */
     void streamClose();

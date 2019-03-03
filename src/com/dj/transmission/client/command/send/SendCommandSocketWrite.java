@@ -68,4 +68,20 @@ public class SendCommandSocketWrite {
                 e.printStackTrace();
         }
     }
+
+    public void sendContinueMessage(TransmissionFileInfo sendFileInfo) {
+        connection();
+        if (isConnection() && stream != null) {
+            try {
+                StringBuffer sb = new StringBuffer("3,");
+                sb.append(sendFileInfo.getFileHash());
+                stream.writeUTF(sb.toString());
+                stream.flush();
+            } catch (IOException e) {
+                if (client.getFileTransmission().getConfig().isDebug())
+                    e.printStackTrace();
+                close();
+            }
+        }
+    }
 }

@@ -78,7 +78,8 @@ public class SendCommandClientDelegateImp implements SendCommandClientDelegate, 
 
     @Override
     public void continueSend() {
-
+        if (sendFileInfo != null && socketWrite != null)
+            socketWrite.sendContinueMessage(sendFileInfo);
     }
 
     @Override
@@ -150,7 +151,7 @@ public class SendCommandClientDelegateImp implements SendCommandClientDelegate, 
                 if (i == client.getFileTransmission().getConfig().sendFileTaskThreadCount() - 1)
                     endIndex = sendFileInfo.getFileSize() - 1;
                 TransmissionFileSectionInfo sectionFileInfo = new TransmissionFileSectionInfo(i * average, endIndex, i * average);
-                sendFileInfo.addSectionInfo(sectionFileInfo);
+                sendFileInfo.getSectionInfos().add(sectionFileInfo);
             }
         }
         // 进行回调
@@ -165,6 +166,15 @@ public class SendCommandClientDelegateImp implements SendCommandClientDelegate, 
         if (accept) {
             // 通知client端发送过来的sendFilePort，马上进行传输文件数据
             handle.sendClientHandleStartCommand(sendFilePort);
+        }
+    }
+
+    @Override
+    public void handleReplyContinueFileInfo(String fileHash, List<TransmissionFileSectionInfo> sectionInfos) {
+        if (sendFileInfo != null && sendFileInfo.getFileHash().equals(fileHash)) {
+            sendFileInfo.getSectionInfos().clear();
+            sendFileInfo.getSectionInfos().addAll(sectionInfos);
+            handle.handleCommandContinue();
         }
     }
 

@@ -48,13 +48,13 @@ public class ReceiveClientTest {
                             System.out.println((state == TransmissionState.START ? "开始" : "暂停") + "接收");
                         }
                     });
-                    client.sendFile(new File("F:\\陈雷\\软件安装包\\iDisplayWin.exe"));
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    client.pauseReceive();
+//                    client.sendFile(new File("F:\\陈雷\\软件安装包\\iDisplayWin.exe"));
+//                    try {
+//                        Thread.sleep(1000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    client.pauseReceive();
                 }
             });
             TransmissionClient client = transmission.createOrGetClient("127.0.0.1", transmission.getConfig().commandPort());

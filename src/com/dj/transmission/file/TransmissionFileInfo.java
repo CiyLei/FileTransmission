@@ -3,13 +3,14 @@ package com.dj.transmission.file;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 public class TransmissionFileInfo {
     private String fileName;
     private Long fileSize;
     private String fileHash;
     private File file;
-    private List<TransmissionFileSectionInfo> sectionInfos;
+    private final Vector<TransmissionFileSectionInfo> sectionInfos = new Vector<>();
 
     /**
      * 接收端是不知道具体目录的，只知道文件名称和大小，所以用这个构造方法
@@ -21,7 +22,6 @@ public class TransmissionFileInfo {
         this.fileName = fileName;
         this.fileSize = fileSize;
         this.fileHash = fileHash;
-        this.sectionInfos = new ArrayList<>();
     }
 
     public TransmissionFileInfo(File file, String fileHash) {
@@ -45,19 +45,13 @@ public class TransmissionFileInfo {
         return sectionInfos;
     }
 
-    public void addSectionInfo(TransmissionFileSectionInfo sectionInfo) {
-        synchronized (TransmissionFileInfo.class) {
-            sectionInfos.add(sectionInfo);
-        }
-    }
-
     public File getFile() {
         return file;
     }
 
     public double getProgress() {
         Long sunSize = 0l;
-        synchronized (TransmissionFileInfo.class) {
+        synchronized (sectionInfos) {
             for (TransmissionFileSectionInfo sectionFileInfo : sectionInfos) {
                 sunSize += sectionFileInfo.getFinishIndex() - sectionFileInfo.getStartIndex();
             }

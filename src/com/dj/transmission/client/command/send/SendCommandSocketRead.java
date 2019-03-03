@@ -1,10 +1,13 @@
 package com.dj.transmission.client.command.send;
 
 import com.dj.transmission.client.TransmissionClient;
+import com.dj.transmission.file.TransmissionFileSectionInfo;
 
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 发送端命令Socket的分析信息类
@@ -65,7 +68,16 @@ public class SendCommandSocketRead {
                     break;
                 // 开始
                 case 4:
-
+                    if (split.length > 2) {
+                        String fileHahs = split[1];
+                        List<TransmissionFileSectionInfo> sectionInfos = new ArrayList<>();
+                        for (int i = 2; i < split.length; i++) {
+                            String[] s1 = split[i].split("-");
+                            if (s1.length == 3)
+                                sectionInfos.add(new TransmissionFileSectionInfo(Long.parseLong(s1[0]), Long.parseLong(s1[1]), Long.parseLong(s1[2])));
+                        }
+                        handle.handleReplyContinueFileInfo(fileHahs, sectionInfos);
+                    }
                     break;
             }
         }

@@ -71,7 +71,8 @@ public class TransmissionClient implements SendCommandClientDelegate, ReceiveCom
 
         @Override
         public void handleCommandContinue() {
-
+            if (sendFileDataController != null)
+                sendFileDataController.start();
         }
     };
 
@@ -323,5 +324,9 @@ public class TransmissionClient implements SendCommandClientDelegate, ReceiveCom
 
     public TransmissionState getSendState() {
         return sendState;
+    }
+
+    public TransmissionState getReceiveState() {
+        return receiveState;
     }
 }
