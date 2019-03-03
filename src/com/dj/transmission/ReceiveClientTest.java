@@ -49,12 +49,18 @@ public class ReceiveClientTest {
                         }
                     });
 //                    client.sendFile(new File("F:\\陈雷\\软件安装包\\iDisplayWin.exe"));
-//                    try {
-//                        Thread.sleep(1000);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                    client.pauseReceive();
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    client.pauseReceive();
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    client.continueReceive();
                 }
             });
             TransmissionClient client = transmission.createOrGetClient("127.0.0.1", transmission.getConfig().commandPort());

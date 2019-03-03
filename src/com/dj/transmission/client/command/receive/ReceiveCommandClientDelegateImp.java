@@ -51,7 +51,9 @@ public class ReceiveCommandClientDelegateImp implements ReceiveCommandClientDele
 
     @Override
     public void continueReceive() {
-
+        if (receiveFileInfo != null &&  socketWrite != null) {
+            handleReceiveFileInfoCommand(receiveFileInfo.getFileHash());
+        }
     }
 
     public void addOnConnectionListener(OnConnectionListener listener) {
