@@ -6,7 +6,6 @@ import com.dj.transmission.client.TransmissionClient;
 import com.dj.transmission.client.command.receive.ReceiveCommandServerSocketController;
 import com.dj.transmission.client.transmission.receive.ReceiveFileDataServerSocketController;
 import com.dj.transmission.config.TransmissionConfig;
-import config.Configuration;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -76,7 +75,7 @@ public class FileTransmission implements TransmissionAdapter {
     @Override
     public ExecutorService commandPool() {
         if (null == commandPoolInstance) {
-            synchronized (Configuration.class) {
+            synchronized (FileTransmission.class) {
                 if (null == commandPoolInstance) {
                     commandPoolInstance = Executors.newCachedThreadPool();
                 }
@@ -88,7 +87,7 @@ public class FileTransmission implements TransmissionAdapter {
     @Override
     public ExecutorService sendFilePool() {
         if (null == sendFilePoolInstance) {
-            synchronized (Configuration.class) {
+            synchronized (FileTransmission.class) {
                 if (null == sendFilePoolInstance) {
                     sendFilePoolInstance = Executors.newFixedThreadPool(config.sendFileTaskThreadCount() * config.sendFileTaskMaxCount());
                 }

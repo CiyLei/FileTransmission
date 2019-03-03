@@ -1,6 +1,5 @@
 package com.dj.transmission.config;
 
-import config.DefaultConfiguration;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -34,7 +33,7 @@ public class TransmissionConfig {
      */
     public String hostName() {
         if (null == hostName) {
-            synchronized (DefaultConfiguration.class) {
+            synchronized (TransmissionConfig.class) {
                 if (null == hostName) {
                     try {
                         hostName = InetAddress.getLocalHost().getHostName();

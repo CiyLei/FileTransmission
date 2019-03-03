@@ -1,5 +1,5 @@
-package com.dj.transmission;
-
+import com.dj.transmission.FileTransmission;
+import com.dj.transmission.OnClienListener;
 import com.dj.transmission.client.command.OnConnectionListener;
 import com.dj.transmission.client.TransmissionClient;
 import com.dj.transmission.client.command.receive.AcceptController;
