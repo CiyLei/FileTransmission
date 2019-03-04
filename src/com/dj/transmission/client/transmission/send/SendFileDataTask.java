@@ -100,7 +100,7 @@ public class SendFileDataTask implements Runnable{
                     callProgress(fileInfo.getProgress());
                 }
 
-            } catch (IOException e) {
+            } catch (Exception e) {
                 if (client.getFileTransmission().getConfig().isDebug())
                     e.printStackTrace();
                 // 报错了，说明接收端强制关闭了socket，则认为是暂停
