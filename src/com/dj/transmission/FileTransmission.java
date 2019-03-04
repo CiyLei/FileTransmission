@@ -135,7 +135,7 @@ public class FileTransmission implements TransmissionAdapter {
      */
     public void clientSetReceiveCommandSocket(Socket socket) {
         synchronized (FileTransmission.class) {
-            String address = socket.getLocalAddress().getHostAddress();
+            String address = socket.getInetAddress().getHostAddress();
             for (int i = 0; i < clients.size(); i++) {
                 // 如果这个接收端的client之前已经有了，直接将socket设置进去
                 if (clients.get(i).getHostAddress().equals(address)) {
@@ -154,7 +154,7 @@ public class FileTransmission implements TransmissionAdapter {
      */
     public void clientSetReceiveFileDataSocket(Socket socket) {
         synchronized (FileTransmission.class) {
-            String address = socket.getLocalAddress().getHostAddress();
+            String address = socket.getInetAddress().getHostAddress();
             for (int i = 0; i < clients.size(); i++) {
                 // 必须保证在这个列表里面，说明是经过command的，不是谁传过来我都收的
                 if (clients.get(i).getHostAddress().equals(address)) {

@@ -17,7 +17,7 @@ public class ReceiveFileDataServerSocketController {
     }
 
     private void run() {
-        transmission.commandPool().execute(new Runnable() {
+        transmission.sendFilePool().execute(new Runnable() {
             @Override
             public void run() {
                 try {
