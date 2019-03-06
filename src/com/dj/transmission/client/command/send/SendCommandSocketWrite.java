@@ -14,10 +14,12 @@ public class SendCommandSocketWrite {
     private TransmissionClient client;
     private Socket socket;
     private DataOutputStream stream;
+    private SendCommandClientHandle handle;
 
-    public SendCommandSocketWrite(TransmissionClient client, Socket socket) {
+    public SendCommandSocketWrite(TransmissionClient client, Socket socket, SendCommandClientHandle handle) {
         this.client = client;
         this.socket = socket;
+        this.handle = handle;
     }
 
     private Boolean isConnection() {
@@ -67,6 +69,7 @@ public class SendCommandSocketWrite {
             if (client.getFileTransmission().getConfig().isDebug())
                 e.printStackTrace();
         }
+        handle.streamClose();
     }
 
     public void sendContinueMessage(TransmissionFileInfo sendFileInfo) {

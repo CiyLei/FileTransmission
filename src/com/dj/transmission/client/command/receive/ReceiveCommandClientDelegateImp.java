@@ -31,7 +31,7 @@ public class ReceiveCommandClientDelegateImp implements ReceiveCommandClientDele
     private void connection() {
         if (socket != null && socket.isConnected()) {
             socketRead = new ReceiveCommandSocketRead(client, socket, this);
-            socketWrite = new ReceiveCommandSocketWrite(client, socket);
+            socketWrite = new ReceiveCommandSocketWrite(client, socket, this);
             client.getFileTransmission().getScheduler().run(new Runnable() {
                 @Override
                 public void run() {
@@ -77,6 +77,7 @@ public class ReceiveCommandClientDelegateImp implements ReceiveCommandClientDele
                     e.printStackTrace();
             }
         }
+        socket = null;
         client.getFileTransmission().getScheduler().run(new Runnable() {
             @Override
             public void run() {

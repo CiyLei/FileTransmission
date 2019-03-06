@@ -40,7 +40,7 @@ public class SendCommandClientDelegateImp implements SendCommandClientDelegate, 
         if (socket == null || socket.isClosed()) {
             try {
                 socket = new Socket(hostAddress, commandPort);
-                socketWrite = new SendCommandSocketWrite(client, socket);
+                socketWrite = new SendCommandSocketWrite(client, socket, this);
                 socketRead = new SendCommandSocketRead(client, socket, this);
             } catch (IOException e) {
                 if (client.getFileTransmission().getConfig().isDebug())
@@ -130,6 +130,7 @@ public class SendCommandClientDelegateImp implements SendCommandClientDelegate, 
             if (client.getFileTransmission().getConfig().isDebug())
                 e.printStackTrace();
         }
+        socket = null;
         client.getFileTransmission().getScheduler().run(new Runnable() {
             @Override
             public void run() {
