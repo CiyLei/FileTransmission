@@ -136,3 +136,82 @@ public FileTransmission(TransmissionConfig config, TransmissionScheduler schedul
 
 `void onStateChange(TransmissionState state)` 接收文件的状态改变回调
 * `TransmissionState state` 
+
+# 针对Android平台的简单适配
+
+### AndroidConfig
+
+继承`TransmissionConfig`针对`Android`的一些适配
+
+```Java
+public class AndroidConfig extends TransmissionConfig {
+    Context context;
+
+    public AndroidConfig(Context context) {
+        this.context = context;
+    }
+
+    /**
+     * 获取cache路径
+     * @return
+     */
+    @Override
+    public String saveFilePath() {
+        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
+                || !Environment.isExternalStorageRemovable()) {
+            return context.getExternalCacheDir().getPath() + File.separator;
+        } else {
+            return context.getCacheDir().getPath() + File.separator;
+        }
+    }
+}
+```
+
+### AndroidScheduler
+
+继承`TransmissionScheduler`针对`Android`的一些适配
+
+```Java
+public class AndroidScheduler extends TransmissionScheduler {
+
+    private static Handler handler = new Handler(Looper.getMainLooper());
+
+    @Override
+    public void run(Runnable scheduler) {
+        handler.post(scheduler);
+    }
+}
+```
+
+### AndroidTransmission
+
+继承`FileTransmission`针对`Android`的一些适配
+
+```Java
+public class AndroidTransmission extends FileTransmission {
+
+    public AndroidTransmission(Context context) throws IOException {
+        super(new AndroidConfig(context), new AndroidScheduler());
+    }
+
+    @Override
+    public Boolean isMainThread() {
+        return Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId();
+    }
+
+    @Override
+    public String encodeString(String str) {
+        return Base64.encodeToString(str.getBytes(), Base64.NO_WRAP);
+    }
+
+    @Override
+    public String decodeString(String str) {
+        try {
+            return new String(Base64.decode(str, Base64.NO_WRAP), getConfig().stringEncode());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+}
+```
