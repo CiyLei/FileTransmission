@@ -109,7 +109,7 @@ public FileTransmission(TransmissionConfig config, TransmissionScheduler schedul
 
 客户端全局的事件回调，就监听是否有文件传输过来了
 
-`public abstract void onReceiveFileInfo`
+`public abstract void onReceiveFileInfo(TransmissionClient client, TransmissionFileInfo fileInfo, AcceptController controller)`
 * `TransmissionClient client` 客户端对象（判断是哪个客户端传过来的）
 * `TransmissionFileInfo fileInfo` 传过来的文件信息
 * `AcceptController controller` 是否同意的控制器
@@ -118,21 +118,21 @@ public FileTransmission(TransmissionConfig config, TransmissionScheduler schedul
 
 作为发送端的回调
 
-`void onAccept` 对方是否同意接收的回调
+`void onAccept(Boolean accept)` 对方是否同意接收的回调
 * `Boolean accept` `true`为同意，反之拒绝
 
-`void onProgress` 发送文件的进度回调
+`void onProgress(double progress)` 发送文件的进度回调
 * `double progress` `0.0` - `1.0`（`1.0`即发送完毕）
 
-`void onStateChange` 发送文件的状态改变回调
+`void onStateChange(TransmissionState state)` 发送文件的状态改变回调
 * `TransmissionState state` 
 
 ### OnReceiveClientListener
 
 作为接收端的回调
 
-`void onProgress` 接收文件的进度回调
+`void onProgress(double progress)` 接收文件的进度回调
 * `double progress` `0.0` - `1.0`（`1.0`即接收完毕）
 
-`void onStateChange` 接收文件的状态改变回调
+`void onStateChange(TransmissionState state)` 接收文件的状态改变回调
 * `TransmissionState state` 
