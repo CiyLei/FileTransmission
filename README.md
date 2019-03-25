@@ -31,9 +31,21 @@ public class TransmissionScheduler {
 }
 ```
 
+### TransmissionAdapter
+
+针对不同平台的适配
+
+|<b>方法</b>|<b>默认值</b>|<b>说明</b>|
+| :------- | :-------: | :-------|
+|`String encodeString(String)`|使用Base64编码|传输过程中对文件名称的编码|
+|`String decodeString(String)`|使用Base64解码|传输过程中对文件名称的解码|
+|`Boolean isMainThread()`|判断是否在创建`FileTransmission`的线程上|判断是否在主线程|
+|`ExecutorService sendFilePool()`|`TransmissionConfig.sendFileTaskThreadCount() * TransmissionConfig.sendFileTaskMaxCount()`|发送文件的线程池|
+|`ExecutorService commandPool()`|`Executors.newCachedThreadPool()`|发送命令socket的线程池|
+
 ### FileTransmission
 
-入口方法，初始化方法参数接收`TransmissionConfig`和`TransmissionScheduler`
+入口类，实现了`FileTransmission`接口，初始化方法参数接收`TransmissionConfig`和`TransmissionScheduler`
 
 ```Java
 public FileTransmission(TransmissionConfig config) throws IOException 
@@ -44,18 +56,6 @@ public FileTransmission(TransmissionConfig config, TransmissionScheduler schedul
 | :------- | :-------|
 |`TransmissionClient createOrGetClient(String hostAddress, Integer commandPort)`|通过此方法创建一个`TransmissionClient`|
 |`void addOnClienListeners(OnClienListener onClienListener)`|监听客户端全局的回调|
-
-### TransmissionAdapter
-
-针对不同平台的适配， `FileTransmission`是实现了这个接口类
-
-|<b>方法</b>|<b>默认值</b>|<b>说明</b>|
-| :------- | :-------: | :-------|
-|`String encodeString(String)`|使用Base64编码|传输过程中对文件名称的编码|
-|`String decodeString(String)`|使用Base64解码|传输过程中对文件名称的解码|
-|`Boolean isMainThread()`|判断是否在创建`FileTransmission`的线程上|判断是否在主线程|
-|`ExecutorService sendFilePool()`|`TransmissionConfig.sendFileTaskThreadCount() * TransmissionConfig.sendFileTaskMaxCount()`|发送文件的线程池|
-|`ExecutorService commandPool()`|`Executors.newCachedThreadPool()`|发送命令socket的线程池|
 
 ### TransmissionClient
 
