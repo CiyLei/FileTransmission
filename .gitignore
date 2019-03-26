@@ -3,3 +3,23 @@
 *.ipr
 *.iws
 .idea/
+
+# gradle
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/build
+/captures
+/.idea
+*.iml
+*.apk
+*.ap_
+*.dex
+*.class
+bin/
+gen/
+/*/build/
+proguard/
+*.log
