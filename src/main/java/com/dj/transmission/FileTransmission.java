@@ -8,10 +8,8 @@ import com.dj.transmission.client.transmission.receive.ReceiveFileDataServerSock
 import com.dj.transmission.config.TransmissionConfig;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
