@@ -1,8 +1,8 @@
 package com.dj.transmission;
 
-import com.dj.transmission.client.TransmissionClient;
 import com.dj.transmission.client.command.receive.AcceptController;
 import com.dj.transmission.file.TransmissionFileInfo;
+import com.dj.transmission.client.TransmissionClient;
 
 /**
  * 全局的事件回调

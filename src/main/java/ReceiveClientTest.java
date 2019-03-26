@@ -1,7 +1,7 @@
 import com.dj.transmission.FileTransmission;
 import com.dj.transmission.OnClienListener;
-import com.dj.transmission.client.command.OnConnectionListener;
 import com.dj.transmission.client.TransmissionClient;
+import com.dj.transmission.client.command.OnConnectionListener;
 import com.dj.transmission.client.command.receive.AcceptController;
 import com.dj.transmission.client.command.receive.OnReceiveClientListener;
 import com.dj.transmission.client.command.send.OnSendClientListener;
@@ -9,7 +9,6 @@ import com.dj.transmission.client.transmission.TransmissionState;
 import com.dj.transmission.config.TransmissionConfig;
 import com.dj.transmission.file.TransmissionFileInfo;
 
-import java.io.File;
 import java.io.IOException;
 
 public class ReceiveClientTest {

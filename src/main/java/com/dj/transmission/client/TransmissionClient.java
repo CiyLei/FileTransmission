@@ -2,20 +2,20 @@ package com.dj.transmission.client;
 
 import com.dj.transmission.FileTransmission;
 import com.dj.transmission.client.command.OnConnectionListener;
-import com.dj.transmission.client.command.CommandClientHandle;
 import com.dj.transmission.client.command.receive.OnReceiveClientListener;
 import com.dj.transmission.client.command.receive.ReceiveCommandClientDelegate;
 import com.dj.transmission.client.command.receive.ReceiveCommandClientDelegateImp;
 import com.dj.transmission.client.command.send.OnSendClientListener;
 import com.dj.transmission.client.command.send.SendCommandClientDelegate;
-import com.dj.transmission.client.command.send.SendCommandClientDelegateImp;
 import com.dj.transmission.client.transmission.TransmissionState;
 import com.dj.transmission.client.transmission.receive.ReceiveClientStateHandle;
+import com.dj.transmission.client.transmission.send.SendClientStateHandle;
+import com.dj.transmission.file.TransmissionFileInfo;
+import com.dj.transmission.client.command.CommandClientHandle;
+import com.dj.transmission.client.command.send.SendCommandClientDelegateImp;
 import com.dj.transmission.client.transmission.receive.ReceiveFileDataController;
 import com.dj.transmission.client.transmission.receive.ReceiveFileDataTask;
-import com.dj.transmission.client.transmission.send.SendClientStateHandle;
 import com.dj.transmission.client.transmission.send.SendFileDataController;
-import com.dj.transmission.file.TransmissionFileInfo;
 
 import java.io.File;
 import java.net.Socket;

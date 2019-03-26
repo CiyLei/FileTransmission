@@ -1,8 +1,8 @@
 package com.dj.transmission.client.command.receive;
 
-import com.dj.transmission.client.TransmissionClient;
 import com.dj.transmission.file.TransmissionFileInfo;
 import com.dj.transmission.file.TransmissionFileSectionInfo;
+import com.dj.transmission.client.TransmissionClient;
 
 import java.io.DataOutputStream;
 import java.io.IOException;

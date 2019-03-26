@@ -1,10 +1,10 @@
 package com.dj.transmission.client.command.receive;
 
-import com.dj.transmission.OnClienListener;
 import com.dj.transmission.client.command.OnConnectionListener;
+import com.dj.transmission.file.TransmissionFileInfo;
+import com.dj.transmission.OnClienListener;
 import com.dj.transmission.client.TransmissionClient;
 import com.dj.transmission.client.command.CommandClientHandle;
-import com.dj.transmission.file.TransmissionFileInfo;
 
 import java.io.IOException;
 import java.net.Socket;

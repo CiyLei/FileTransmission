@@ -2,10 +2,10 @@ package com.dj.transmission.client.command.send;
 
 import com.dj.transmission.client.TransmissionClient;
 import com.dj.transmission.client.command.OnConnectionListener;
-import com.dj.transmission.client.command.CommandClientHandle;
 import com.dj.transmission.file.TransmissionFileInfo;
 import com.dj.transmission.file.TransmissionFileSectionInfo;
 import com.dj.transmission.utils.MD5Util;
+import com.dj.transmission.client.command.CommandClientHandle;
 
 import java.io.File;
 import java.io.FileNotFoundException;
