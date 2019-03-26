@@ -1,6 +1,7 @@
 package com.dj.transmission.client.command.receive;
 
 import com.dj.transmission.client.TransmissionClient;
+import org.json.JSONObject;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -53,27 +54,22 @@ public class ReceiveCommandSocketRead {
 
     // 作为接收端获取到的信息，只用分析type为1和3的情况
     private void analysisReplyMsg(String result) {
-        String[] split = result.split(",");
-        if (split.length > 0) {
-            switch (Integer.parseInt(split[0])) {
-                // 回复了是否接收文件的信息，这里分析进行回调
-                case 1:
-                    if (split.length == 5) {
-                        String fileName = client.getFileTransmission().decodeString(split[1]);
-                        Long fileSize = Long.parseLong(split[2]);
-                        String fileHash = split[3];
-                        Integer commandPort = Integer.parseInt(split[4]);
-                        handle.handleFileInfoCommand(fileName, fileSize, fileHash, commandPort);
-                    }
-                    break;
-                // 开始
-                case 3:
-                    if (split.length == 2) {
-                        String fileHash = split[1];
-                        handle.handleReceiveFileInfoCommand(fileHash);
-                    }
-                    break;
-            }
+        JSONObject jo = new JSONObject(result);
+        int type = jo.getInt("type");
+        JSONObject jo_data = jo.getJSONObject("data");
+        switch (type) {
+            // 回复了是否接收文件的信息，这里分析进行回调
+            case 1:
+                String fileName = jo_data.getString("flieName");
+                Long fileSize = jo_data.getLong("fileSize");
+                String fileHash = jo_data.getString("fileHash");
+                Integer commandPort = jo_data.getInt("commandPort");
+                handle.handleFileInfoCommand(fileName, fileSize, fileHash, commandPort);
+                break;
+            // 开始
+            case 3:
+                handle.handleReceiveFileInfoCommand(jo_data.getString("fileHash"));
+                break;
         }
     }
 

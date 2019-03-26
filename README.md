@@ -37,8 +37,6 @@ public class TransmissionScheduler {
 
 |<b>方法</b>|<b>默认值</b>|<b>说明</b>|
 | :------- | :-------: | :-------|
-|`String encodeString(String)`|使用Base64编码|传输过程中对文件名称的编码|
-|`String decodeString(String)`|使用Base64解码|传输过程中对文件名称的解码|
 |`Boolean isMainThread()`|判断是否在创建`FileTransmission`的线程上|判断是否在主线程|
 |`ExecutorService sendFilePool()`|`TransmissionConfig.sendFileTaskThreadCount() * TransmissionConfig.sendFileTaskMaxCount()`|发送文件的线程池|
 |`ExecutorService commandPool()`|`Executors.newCachedThreadPool()`|发送命令socket的线程池|
@@ -197,21 +195,6 @@ public class AndroidTransmission extends FileTransmission {
     @Override
     public Boolean isMainThread() {
         return Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId();
-    }
-
-    @Override
-    public String encodeString(String str) {
-        return Base64.encodeToString(str.getBytes(), Base64.NO_WRAP);
-    }
-
-    @Override
-    public String decodeString(String str) {
-        try {
-            return new String(Base64.decode(str, Base64.NO_WRAP), getConfig().stringEncode());
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return "";
     }
 }
 ```

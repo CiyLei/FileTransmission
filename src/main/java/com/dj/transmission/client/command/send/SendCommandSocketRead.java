@@ -2,6 +2,8 @@ package com.dj.transmission.client.command.send;
 
 import com.dj.transmission.client.TransmissionClient;
 import com.dj.transmission.file.TransmissionFileSectionInfo;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -55,31 +57,25 @@ public class SendCommandSocketRead {
 
     // 作为发送端获取到的信息，只用分析type为2和4的情况
     private void analysisReplyMsg(String result) {
-        String[] split = result.split(",");
-        if (split.length > 0) {
-            switch (Integer.parseInt(split[0])) {
-                // 回复了是否接收文件的信息，这里分析进行回调
-                case 2:
-                    if (split.length == 3) {
-                        Boolean accept = split[1].trim().equals("1");
-                        Integer sendFilePort = Integer.parseInt(split[2]);
-                        handle.handleReplyAccept(accept, sendFilePort);
-                    }
-                    break;
-                // 开始
-                case 4:
-                    if (split.length > 2) {
-                        String fileHahs = split[1];
-                        List<TransmissionFileSectionInfo> sectionInfos = new ArrayList<>();
-                        for (int i = 2; i < split.length; i++) {
-                            String[] s1 = split[i].split("-");
-                            if (s1.length == 3)
-                                sectionInfos.add(new TransmissionFileSectionInfo(Long.parseLong(s1[0]), Long.parseLong(s1[1]), Long.parseLong(s1[2])));
-                        }
-                        handle.handleReplyContinueFileInfo(fileHahs, sectionInfos);
-                    }
-                    break;
-            }
+        JSONObject jo = new JSONObject(result);
+        int type = jo.getInt("type");
+        JSONObject jo_data = jo.getJSONObject("data");
+        switch (type) {
+            // 回复了是否接收文件的信息，这里分析进行回调
+            case 2:
+                handle.handleReplyAccept(jo_data.getBoolean("isAccept"), jo_data.getInt("sendPort"));
+                break;
+            // 开始
+            case 4:
+                String fileHahs = jo_data.getString("fileHash");
+                List<TransmissionFileSectionInfo> sectionInfos = new ArrayList<>();
+                JSONArray ja_sections = jo_data.getJSONArray("sections");
+                for (int i = 0; i < ja_sections.length(); i++) {
+                    JSONObject jo_section = ja_sections.getJSONObject(i);
+                    sectionInfos.add(new TransmissionFileSectionInfo(jo_section.getLong("startIndex"), jo_section.getLong("endIndex"), jo_section.getLong("finishIndex")));
+                }
+                handle.handleReplyContinueFileInfo(fileHahs, sectionInfos);
+                break;
         }
     }
 

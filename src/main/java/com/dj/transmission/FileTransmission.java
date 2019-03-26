@@ -52,22 +52,6 @@ public class FileTransmission implements TransmissionAdapter {
     }
 
     @Override
-    public String encodeString(String str) {
-        return Base64.getEncoder().encodeToString(str.getBytes());
-    }
-
-    @Override
-    public String decodeString(String str) {
-        try {
-            return new String(Base64.getDecoder().decode(str), config.stringEncode());
-        } catch (UnsupportedEncodingException e) {
-            if (config.isDebug())
-                e.printStackTrace();
-        }
-        return str;
-    }
-
-    @Override
     public Boolean isMainThread() {
         return mainThreadId == Thread.currentThread().getId();
     }
