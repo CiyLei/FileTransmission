@@ -1,6 +1,7 @@
 # FileTransmission
 
-多线程，断点续传，局域网文件传输
+多线程，断点续传，局域网文件传输<br/>
+[传输协议说明](https://github.com/CiyLei/FileTransmission/blob/master/Tranmission.md)
 
 ### TransmissionConfig
 
