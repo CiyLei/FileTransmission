@@ -4,7 +4,7 @@
 {
     "type": 1,
     "data": {
-        "flieName": "文件名称",
+        "fileName": "文件名称",
         "fileSize": 111111,
         "fileHash": "文件hash",
         "commandPort": 111

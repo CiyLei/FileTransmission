@@ -60,7 +60,7 @@ public class ReceiveCommandSocketRead {
         switch (type) {
             // 回复了是否接收文件的信息，这里分析进行回调
             case 1:
-                String fileName = jo_data.getString("flieName");
+                String fileName = jo_data.getString("fileName");
                 Long fileSize = jo_data.getLong("fileSize");
                 String fileHash = jo_data.getString("fileHash");
                 Integer commandPort = jo_data.getInt("commandPort");

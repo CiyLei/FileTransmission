@@ -17,7 +17,7 @@ public class TransmissionJsonConverter {
         JSONObject jo = new JSONObject();
         jo.put("type", 1);
         JSONObject jo_data = new JSONObject();
-        jo_data.put("flieName", fileInfo.getFileName());
+        jo_data.put("fileName", fileInfo.getFileName());
         jo_data.put("fileSize", fileInfo.getFileSize());
         jo_data.put("fileHash", fileInfo.getFileHash());
         jo_data.put("commandPort", commandPort);
