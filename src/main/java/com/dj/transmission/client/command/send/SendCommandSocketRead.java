@@ -45,7 +45,7 @@ public class SendCommandSocketRead {
                             String result = stream.readUTF();
                             analysisReplyMsg(result);
                         }
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         if (client.getFileTransmission().getConfig().isDebug())
                             e.printStackTrace();
                         close();

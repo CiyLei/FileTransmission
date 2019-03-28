@@ -4,6 +4,7 @@ import com.dj.transmission.client.TransmissionClient;
 import com.dj.transmission.client.command.send.OnSendClientListener;
 import com.dj.transmission.client.transmission.TransmissionState;
 import com.dj.transmission.file.TransmissionFileInfo;
+import com.dj.transmission.utils.TransmissionJsonConverter;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -55,17 +56,8 @@ public class SendFileDataTask implements Runnable{
             connection();
         if (isConnection()) {
             try {
-                // 先发送文件的hash,让接收端确认
-                dataOutputStream.writeUTF(fileInfo.getFileHash());
-                dataOutputStream.flush();
-                // 再发送文件的开始索引
-                dataOutputStream.writeLong(fileInfo.getSectionInfos().get(sectionIndex).getStartIndex());
-                dataOutputStream.flush();
-                // 再发送文件的结束索引
-                dataOutputStream.writeLong(fileInfo.getSectionInfos().get(sectionIndex).getEndIndex());
-                dataOutputStream.flush();
-                // 再发送文件的完成进度索引
-                dataOutputStream.writeLong(fileInfo.getSectionInfos().get(sectionIndex).getFinishIndex());
+                // 发送文件分块信息
+                dataOutputStream.writeUTF(TransmissionJsonConverter.converterTransmissionInfo2Json(fileInfo.getFileHash(), fileInfo.getSectionInfos().get(sectionIndex)));
                 dataOutputStream.flush();
                 // 再取文件发送数据
                 randomAccessFile.seek(fileInfo.getSectionInfos().get(sectionIndex).getFinishIndex());

@@ -64,8 +64,8 @@ public class Main {
              * 你看 你在config里面是不是设置了sendFileUpdateFrequency更新频率，所以onProgress并不是实时的，暂停了之后，后续也会继续将真实的数值回调回来
              */
             client.pauseSend();
-//            Thread.sleep(3000);
-//            client.continueSend();
+            Thread.sleep(3000);
+            client.continueSend();
 //            Thread.sleep(3000);
 //            client.sendFile(new File("F:\\陈雷\\软件安装包\\ADSafe_3.5.5.1119.exe"));
         } catch (Exception e) {

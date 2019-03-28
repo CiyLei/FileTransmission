@@ -54,12 +54,12 @@ public class ReceiveClientTest {
 //                        e.printStackTrace();
 //                    }
 //                    client.pauseReceive();
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    client.continueReceive();
+//                    try {
+//                        Thread.sleep(3000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    client.continueReceive();
                 }
             });
             TransmissionClient client = transmission.createOrGetClient("127.0.0.1", transmission.getConfig().commandPort());

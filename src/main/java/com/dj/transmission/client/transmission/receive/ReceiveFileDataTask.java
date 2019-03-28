@@ -4,6 +4,7 @@ import com.dj.transmission.client.TransmissionClient;
 import com.dj.transmission.client.command.receive.OnReceiveClientListener;
 import com.dj.transmission.file.TransmissionFileInfo;
 import com.dj.transmission.file.TransmissionFileSectionInfo;
+import org.json.JSONObject;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -34,13 +35,14 @@ public class ReceiveFileDataTask implements Runnable{
         isStart = true;
         try {
             dataInputStream = new DataInputStream(socket.getInputStream());
-            String fileHash = dataInputStream.readUTF();
+            TranmissionSectionsInfo sectionsInfo = TranmissionSectionsInfo.json2Modle(dataInputStream.readUTF());
+            String fileHash = sectionsInfo.fileHash;
             controller.verificationStart(fileHash);
             // 如果传输过来的文件hash与之前接收的文件hash值对不上的话，直接关闭拒绝接收
             if (reveiceFileInfo.getFileHash().equals(fileHash)) {
-                Long startIndex = dataInputStream.readLong();
-                Long endIndex = dataInputStream.readLong();
-                Long finishIndex = dataInputStream.readLong();
+                Long startIndex = sectionsInfo.startIndex;
+                Long endIndex = sectionsInfo.endIndex;
+                Long finishIndex = sectionsInfo.finishIndex;
                 TransmissionFileSectionInfo sectionInfo = new TransmissionFileSectionInfo(startIndex, endIndex, finishIndex);
                 reveiceFileInfo.getSectionInfos().add(sectionInfo);
                 String saveFilePath = createSaveFilePath(client.getFileTransmission().getConfig().saveFilePath());
@@ -71,7 +73,7 @@ public class ReceiveFileDataTask implements Runnable{
             } else {
                 socketClose();
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             if (client.getFileTransmission().getConfig().isDebug())
                 e.printStackTrace();
 //            controller.getReceiveClientStateHandle().receiveClientStateChange(TransmissionState.PAUSE);
@@ -126,5 +128,22 @@ public class ReceiveFileDataTask implements Runnable{
         randomAccessFile = null;
         dataInputStream = null;
         socket = null;
+    }
+
+    private static class TranmissionSectionsInfo {
+        String fileHash;
+        Long startIndex;
+        Long endIndex;
+        Long finishIndex;
+
+        public static TranmissionSectionsInfo json2Modle(String json) {
+            TranmissionSectionsInfo sectionsInfo = new TranmissionSectionsInfo();
+            JSONObject jo = new JSONObject(json);
+            sectionsInfo.fileHash = jo.getString("fileHash");
+            sectionsInfo.startIndex = jo.getLong("startIndex");
+            sectionsInfo.endIndex = jo.getLong("endIndex");
+            sectionsInfo.finishIndex = jo.getLong("finishIndex");
+            return sectionsInfo;
+        }
     }
 }

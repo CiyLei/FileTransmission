@@ -77,4 +77,13 @@ public class TransmissionJsonConverter {
         jo.put("data", jo_data);
         return jo.toString();
     }
+
+    public static String converterTransmissionInfo2Json(String fileHash, TransmissionFileSectionInfo sectionInfo) {
+        JSONObject jo = new JSONObject();
+        jo.put("fileHash", fileHash);
+        jo.put("startIndex", sectionInfo.getStartIndex());
+        jo.put("endIndex", sectionInfo.getEndIndex());
+        jo.put("finishIndex", sectionInfo.getFinishIndex());
+        return jo.toString();
+    }
 }
