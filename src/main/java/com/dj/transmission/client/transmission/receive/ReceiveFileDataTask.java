@@ -80,6 +80,7 @@ public class ReceiveFileDataTask implements Runnable{
             controller.checkAllClose();
         } finally {
             socketClose();
+            callProgress(reveiceFileInfo.getProgress());
         }
     }
 

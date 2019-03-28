@@ -99,6 +99,7 @@ public class SendFileDataTask implements Runnable{
                 sendFileDataController.getSendClientStateHandle().sendClientStateChange(TransmissionState.PAUSE);
             } finally {
                 socketClose();
+                callProgress(fileInfo.getProgress());
             }
         }
     }
